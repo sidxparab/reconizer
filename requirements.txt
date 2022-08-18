@@ -1,0 +1,8 @@
+argparse 		  #dorks_hunter
+tldextract  	#dorks_hunter
+google     		#dorks_hunter
+emailfinder 	#emailfinder
+h8mail 			  #h8mail
+dnspython 		#dnsvalidator
+colorclass 		#dnsvalidator
+netaddr 		  #dnsvalidator
