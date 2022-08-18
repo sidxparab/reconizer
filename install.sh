@@ -6,8 +6,8 @@ blue='\033[1;33m'
 yellow='\033[1;33m'
 reset='\033[0m'
 
-#STD_OUT="&>/dev/null"
-#STD_ERR="2>/dev/null"
+STD_OUT="&>/dev/null"
+STD_ERR="2>/dev/null"
 
 
 shell_profile=.$(basename $(which $SHELL))rc
@@ -98,11 +98,9 @@ install_misc()
 	 sudo make install
 	 cd $SCRIPTPATH
 	 subfinder
-	 #touch $tools/.github_tokens
-	 wget https://gist.githubusercontent.com/sidxparab/bfbcb66428e0bcdf5c8ab839d8bac388/raw/a2ebc2b4270c9625dae05e19087f4d1e37a332cd/github_tokens > $tools/.github_tokens
+	 touch $tools/.github_tokens
 	 wget -q -O - https://wordlists-cdn.assetnote.io/data/manual/best-dns-wordlist.txt > $tools/sub_brute_large.text
-	 #wget -q -O - https://gist.githubusercontent.com/jhaddix/86a06c5dc309d08580a018c66354a056/raw/96f4e51d96b2203f19f6381c8c545b278eaa0837/all.txt > $tools/sub_brute_small.txt
-	 wget -q -O - https://raw.githubusercontent.com/danielmiessler/SecLists/master/Discovery/DNS/deepmagic.com-prefixes-top500.txt > $tools/sub_brute_small.txt
+	 wget -q -O - https://gist.githubusercontent.com/jhaddix/86a06c5dc309d08580a018c66354a056/raw/96f4e51d96b2203f19f6381c8c545b278eaa0837/all.txt > $tools/sub_brute_small.txt
 	 wget -q -O - https://gist.githubusercontent.com/sidxparab/94a231f058b277d995f800c0174a5744/raw/02d621d317b0161ac0d7278fa8bd0c7fb710ba6c/resolvers_trusted.txt > $tools/resolvers_trusted.txt
 	 wget -q -O - https://gist.githubusercontent.com/sidxparab/b5cf037265d376a7fdf2a5a9abac9764/raw/5dd6f19242da0de984dab02b90920edeb07621f0/permutation_list.txt > $tools/permutation_list.txt
 	 mkdir -p ~/.config/amass/
