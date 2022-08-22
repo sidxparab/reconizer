@@ -1,6 +1,6 @@
 <h1 align="center">
   <br>
-  <a href="https://github.com/sidxparab/reconizer"><img src="https://github.com/sixparab/reconizer/blob/main/Images/reconizer_banner.png" alt="reconizer"></a>
+  <a href="https://github.com/sidxparab/reconizer"><img src="https://github.com/sidxparab/reconizer/blob/main/Images/reconizer_banner.png" alt="reconizer"></a>
   <br>
   Recoznier
   <br>
