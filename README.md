@@ -26,8 +26,8 @@
 - [:fire: Features :fire:](#fire-features-fire)
   - [Osint](#osint)
   - [Subdomains](#subdomains)
-- [Features to be added:](#Features-to-be-added:)
-- [Still Need help? :information_source:](#Still-Need-help?)
+- [Features to be added:](#features-to-be-added)
+- [Still Need help? :information_source:](#still-need-help-information_source)
 
 ---
 
