@@ -54,8 +54,9 @@ cd reconizer/
 | -d | Specify the target domain   |
 | -c | Check for Installed tools |
 | -n | Run OSINT mode  |
-| -r | Run Subdomain Enumeration Mode |
-| -a | All scan (OSINT+Subdomain)|
+| -s | Run Subdomain Enumeration Mode |
+| -a | Axiom Subdomain Scan |
+| -f | All scan (OSINT+Subdomain) |
 | -h | Show help section |
 
 
