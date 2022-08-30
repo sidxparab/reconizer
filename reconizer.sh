@@ -65,6 +65,7 @@ tools_installed()
 	eval type -P unfurl $STD_OUT && printf "${green} [*] Unfurl [YES]${reset}\n" || printf "${red} [*] Unfurl [NO]${reset}\n"
 	eval type -P analyticsrelationships $STD_OUT && printf "${green} [*] Analyticsrelationships [YES]${reset}\n" || printf "${red} [*] Analyticsrelationships [NO]${reset}\n"
 	eval type -P nuclei $STD_OUT && printf "${green} [*] Nuclei [YES]${reset}\n" || printf "${red} [*] Nuclei [NO]${reset}\n"
+	eval type -P gowitness $STD_OUT && printf "${green} [*] Gowitness [YES]${reset}\n" || printf "${red} [*] Gowitness [NO]${reset}\n"
 
 
 	printf "${green}##############################################################################${reset}\n\n"
@@ -135,7 +136,7 @@ subdomain_passive()
 	cat .tmp/gau_tmp.txt | unfurl -u domains | grep ".$domain$" | anew -q .tmp/passive_gau.txt
 
 	Number_of_lines=$(find .tmp -type f -iname "passive*" -exec cat {} \; | sed "s/*.//" | anew .tmp/passive_subs.txt | wc -l)
-	printf "${green}Found!!: $Total_subs new subdomains${reset}\n\n"
+	printf "${green}Found!!: $Number_of_lines new subdomains${reset}\n\n"
 	printf "${yellow}Passive Enumeration Ended${reset}\n"
 	printf "${green}##############################################################################${reset}\n\n"
 }
@@ -174,10 +175,10 @@ subdomain_bruteforcing()
 subdomain_permutations()
 {
 	printf "${yellow}Subdomain Permutations started${reset}\n\n"
-	eval $GOTATOR_TIMEOUT gotator -sub subdomains/subdomains.txt -perm $tools/permutation_list.txt -depth 1 -numbers 10 -mindup -adv -md -silent > .tmp/gotator_out.txt $STD_OUT
+	eval $GOTATOR_TIMEOUT gotator -sub subdomains/subdomains.txt -perm $tools/permutation_list.txt -depth 1 -numbers 10 -mindup -adv -md -silent > .tmp/gotator_out.txt
 	eval puredns resolve .tmp/gotator_out.txt -w .tmp/permutations_valid.txt -r $tools/resolvers.txt --resolvers-trusted $tools/resolvers_trusted.txt $STD_OUT
 	Number_of_lines=$(cat .tmp/permutations_valid.txt | grep ".$domains$" | anew subdomains/subdomains.txt | wc -l)
-	#eval rm -rf .tmp/gotator_out.txt $STD_OUT
+	#eval rm .tmp/gotator_out.txt $STD_OUT
 	printf "${green}Found!!: $Number_of_lines new subdomains ${reset}\n\n"
 	printf "${yellow}Subdomain Permutations Ended${reset}\n"
 	printf "${green}##############################################################################${reset}\n\n"
@@ -186,12 +187,13 @@ subdomain_permutations()
 subdomian_scraping()
 {
 	printf "${yellow}Subdomain Scraping started${reset}\n\n"
-	eval cat subdomains/subdomains.txt | httpx -retries 2 -timeout 10 -o .tmp/scrap_probed.txt $STD_OUT
+	eval cat subdomains/subdomains.txt | httpx -retries 2 -timeout 10 -silent -o .tmp/scrap_probed.txt $STD_OUT
 	eval gospider -S .tmp/scrap_probed.txt --js -d 2 --sitemap --robots -w -r > .tmp/gospider.txt
 	sed -i '/^.\{2048\}./d' .tmp/gospider.txt
 	eval cat .tmp/gospider.txt | grep -aEo 'https?://[^ ]+' | sed 's/]$//' | unfurl -u domains | grep ".$domain$" | anew -q .tmp/scrap_subs_no_resolved.txt $STD_OUT
 	eval puredns resolve .tmp/scrap_subs_no_resolved.txt -w .tmp/scrap_valid.txt -r $tools/resolvers.txt --resolvers-trusted $tools/resolvers_trusted.txt $STD_OUT
 	Number_of_lines=$(cat .tmp/scrap_valid.txt | grep ".$domain$" | anew subdomains/subdomains.txt | wc -l)
+	#eval rm .tmp/ gospider.txt $STD_OUT
 	printf "${green}Found!!: $Number_of_lines new subdomains ${reset}\n\n"
 	printf "${yellow}Subdomain Scraping Ended${reset}\n"
 	printf "${green}##############################################################################${reset}\n\n"
@@ -228,8 +230,27 @@ web_probing()
 	printf "${green}Found!!: $Number_of_lines New Websites${reset}\n\n"
 	printf "${yellow}Web probing Ended${reset}\n"
 	printf "${green}##############################################################################${reset}\n\n"
+}
 
+web_screenshot()
+{
+	printf "${yellow}Web screenshots Started${reset}\n\n"
+	eval gowitness file -f web/webs.txt -t 8 --disable-logging $STD_OUT
+	printf "${yellow}Web screenshots Ended${reset}\n"
+	printf "${green}##############################################################################${reset}\n\n"
+}
 
+nuclei()
+{
+	mkdir -p nuclei_output/
+	printf "${yellow}Nuclei Vulnerability Scanning Started${reset}\n\n"
+	nuclei -severity info -silent -t ~/nuclei-templates/ -retries 2 -o nuclei_output/info.txt
+	nuclei -severity low -silent -t ~/nuclei-templates/ -retries 2 -o nuclei_output/low.txt
+	nuclei -severity medium -silent -t ~/nuclei-templates/ -retries 2 -o nuclei_output/medium.txt
+	nuclei -severity high -silent -t ~/nuclei-templates/ -retries 2 -o nuclei_output/high.txt
+	nuclei -severity critical -o nuclei_output/critical.txt
+	printf "${yellow}Nuclei Vulnerability Scanning Ended${reset}\n"
+	printf "${green}##############################################################################${reset}\n\n"
 }
 
 help()
@@ -241,7 +262,8 @@ help()
 	printf "	-d example.com  Target Domain\n\n"
 	printf "${blue}SCAN MODES${reset}\n"
 	printf "	-n OSINT Scan\n"
-	printf "	-s Subdomain Scan\n\n"
+	printf "	-s Subdomain Scan\n"
+	printf "	-a All Scan\n\n"
 	printf "${blue}OUTPUT OPTIONS${reset}\n"
 	printf "	-o Output Folder\n\n"
 	printf "${blue}SHOW HELP SECTION${reset}\n"
@@ -268,7 +290,7 @@ then
 fi
 
 
-while getopts ":d:o:snhc" opt;do
+while getopts ":d:o:snahc" opt;do
 	case ${opt} in
 		d ) domain=$OPTARG
 			;;
@@ -291,9 +313,31 @@ while getopts ":d:o:snhc" opt;do
 			subdomian_scraping
 			subdomain_analytics
 			subdomain_takeover
+			web_probing
+			web_screenshot
+			nuclei
 			;;
 		o ) output_folder=$OPTARG
 			;;
+		a )
+			start
+			osint_init
+			google_dorks
+			github_dorks
+			email_osint
+			osint_end
+			subdomain_init
+			subdomain_passive
+			subdomain_crt
+			subdomain_active
+			subdomain_bruteforcing
+			subdomain_permutations
+			subdomian_scraping
+			subdomain_analytics
+			subdomain_takeover
+			web_probing
+			web_screenshot
+			nuclei
 		c )
 			tools_installed
 			;;

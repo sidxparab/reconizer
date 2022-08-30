@@ -54,13 +54,14 @@ go_tools()
 	eval go install -v github.com/tomnomnom/unfurl@latest $STD_OUT
 	eval go install -v github.com/Josue87/analyticsrelationships@latest $STD_OUT
 	eval go install -v github.com/projectdiscovery/nuclei/v2/cmd/nuclei@latest $STD_OUT
+	eval go install -v github.com/sensepost/gowitness@latest $STD_OUT
 
 	export GOROOT=/usr/local/go
     export GOPATH=$HOME/go
     export PATH=$GOPATH/bin:$GOROOT/bin:$HOME/.local/bin:$PATH
 
-    source ~/.bashrc $STD_OUT
-	source ~/.zshrc $STD_OUT
+    eval source ~/.bashrc $STD_OUT
+    eval source ~/.zshrc $STD_OUT
 }
 
 
@@ -89,15 +90,15 @@ install_misc()
 {
 	 printf "${yellow}##################################################################${reset}\n\n"
 	 printf "${green}Performing some miscellaneous tasks${reset}\n\n"
-	 wget https://github.com/Findomain/Findomain/releases/download/8.2.0/findomain-linux.zip
-	 unzip findomain-linux.zip
+	 eval wget https://github.com/Findomain/Findomain/releases/download/8.2.0/findomain-linux.zip $STD_OUT
+	 eval unzip findomain-linux.zip $STD_OUT
 	 mv findomain /usr/local/bin/findomain
 	 chmod 755 /usr/local/bin/findomain
 	 cd $tools/massdns
-	 make
-	 sudo make install
+	 eval make $STD_OUT
+	 eval sudo make install $STD_OUT
 	 cd $SCRIPTPATH
-	 subfinder
+	 eval subfinder $STD_OUT
 	 touch $tools/.github_tokens
 	 wget -q -O - https://wordlists-cdn.assetnote.io/data/manual/best-dns-wordlist.txt > $tools/sub_brute_large.text
 	 wget -q -O - https://gist.githubusercontent.com/jhaddix/86a06c5dc309d08580a018c66354a056/raw/96f4e51d96b2203f19f6381c8c545b278eaa0837/all.txt > $tools/sub_brute_small.txt
