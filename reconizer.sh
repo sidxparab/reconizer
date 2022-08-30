@@ -36,7 +36,7 @@ start()
 	mkdir -p .tmp/
 	tools=~/Tools
 	tools_installed
-	printf "\n${green}##########################################################################${reset}"
+	printf "\n${green}#############################################################################${reset}"
 	printf "\n${red}Target: $domain ${reset}\n"
 }
 
@@ -45,6 +45,12 @@ tools_installed()
 {
 	printf "${yellow} Checking the installation of tools${reset}\n"
 	printf "${green}###########################################################################${reset}\n"
+	[ -f $tools/ctfr/ctfr.py ] && printf "${green} [*] ctfr.py [YES]${reset}\n" || printf "${bred} [*] ctfr.py [NO]${reset}\n"
+	[ -f $tools/dnsvalidator/dnsvalidator/dnsvalidator.py ] && printf "${green} [*] dnsvalidator [YES]${reset}\n" || printf "${bred} [*] dnsvalidator [NO]${reset}\n"
+	[ -f $tools/dorks_hunter/dorks_hunter.py ] && printf "${green} [*] dorks_hunter [YES]${reset}\n" || printf "${bred} [*] dorks_hunter [NO]${reset}\n"
+
+
+
 
 	eval type -P amass $STD_OUT && printf "${green} [*] Amass [YES]${reset}\n" || printf "${red} [*] Amass [NO]${reset}\n"
 	eval type -P subfinder $STD_OUT && printf "${green} [*] Subfinder [YES]${reset}\n" || printf "${red} [*] Subfinder [NO]${reset}\n"
@@ -60,10 +66,6 @@ tools_installed()
 	eval type -P analyticsrelationships $STD_OUT && printf "${green} [*] Analyticsrelationships [YES]${reset}\n" || printf "${red} [*] Analyticsrelationships [NO]${reset}\n"
 	eval type -P nuclei $STD_OUT && printf "${green} [*] Nuclei [YES]${reset}\n" || printf "${red} [*] Nuclei [NO]${reset}\n"
 	eval type -P gowitness $STD_OUT && printf "${green} [*] Gowitness [YES]${reset}\n" || printf "${red} [*] Gowitness [NO]${reset}\n"
-	
-	[ -f $tools/ctfr/ctfr.py ] && printf "${green} [*] ctfr.py [YES]${reset}\n" || printf "${bred} [*] ctfr.py [NO]${reset}\n"
-	[ -f $tools/dnsvalidator/dnsvalidator/dnsvalidator.py ] && printf "${green} [*] dnsvalidator [YES]${reset}\n" || printf "${bred} [*] dnsvalidator [NO]${reset}\n"
-	[ -f $tools/dorks_hunter/dorks_hunter.py ] && printf "${green} [*] dorks_hunter [YES]${reset}\n" || printf "${bred} [*] dorks_hunter [NO]${reset}\n"
 
 
 	printf "${green}##############################################################################${reset}\n\n"
@@ -212,7 +214,7 @@ subdomian_scraping()
 subdomain_analytics()
 {
 	printf "${yellow}Subdomain Analytics Enumeration started${reset}\n\n"
-	eval cat .tmp/scrap_probed.txt | analyticsrelationships -ch >> .tmp/analytics_subs_tmp.txt $STD_OUT
+	eval cat .tmp/scrap_probed.txt | analyticsrelationships -ch >> .tmp/analytics_subs_tmp.txt &>/dev/null
 	[ -s ".tmp/analytics_subs_tmp.txt" ] && cat .tmp/analytics_subs_tmp.txt | grep ".$domain$" | anew .tmp/analytics_subs.txt $STD_OUT
 	Number_of_lines=$(cat .tmp/analytics_subs.txt | anew subdomains/subdomains.txt | wc -l)
 	printf "${green}Found!!: $Number_of_lines new subdomains ${reset}\n\n"
@@ -224,7 +226,7 @@ subdomain_takeover()
 {
 	printf "${yellow}Subdomain Takeover Detection started${reset}\n\n"
 	eval nuclei -update-templates $DEBUG_STD
-	eval cat subdomains/subdomains.txt | nuclei -silent -tags takeover -severity low,medium,high,critical -r $tools/resolvers_trusted.txt -retries 3 -o .tmp/sub_takeover.txt $STD_OUT
+	cat subdomains/subdomains.txt | nuclei -silent -tags takeover -severity low,medium,high,critical -r $tools/resolvers_trusted.txt -retries 3 -o .tmp/sub_takeover.txt &>/dev/null
 	Number_of_lines=$(cat .tmp/sub_takeover.txt | anew subdomains/takeovers.txt | wc -l)
 	printf "${green}Found!!: $Number_of_lines subdomain takeovers${reset}\n\n"
 	printf "${yellow}Subdomain Takeover Detection Ended${reset}\n"
@@ -235,7 +237,7 @@ web_probing()
 {
 	mkdir -p web/
 	printf "${yellow}Web probing started${reset}\n\n"
-	eval httpx -retries 2 -silent -timeout 10 -l sudomains/subdomains.txt -o .tmp/web_probed_tmp.txt $STD_OUT
+	eval httpx -retries 2 -silent -timeout 10 -l subdomains/subdomains.txt -o .tmp/web_probed_tmp.txt $STD_OUT
 	Number_of_lines=$(cat .tmp/web_probed_tmp.txt | anew web/webs.txt  | wc -l )
 	printf "${green}Found!!: $Number_of_lines New Websites${reset}\n\n"
 	printf "${yellow}Web probing Ended${reset}\n"
@@ -347,7 +349,6 @@ while getopts ":d:o:snahc" opt;do
 			axiom="True"
 			start
 			axiom_init
-			subdomain_init
 			subdomain_passive
 			subdomain_crt
 			subdomain_active
