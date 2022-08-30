@@ -225,7 +225,7 @@ web_probing()
 {
 	mkdir -p web/
 	printf "${yellow}Web probing started${reset}\n\n"
-	eval cat sudomains/subdomains.txt | httpx -retries 2 -timeout 10 -o .tmp/web_probed_tmp.txt $STD_OUT
+	eval httpx -retries 2 -silent -timeout 10 -l sudomains/subdomains.txt -o .tmp/web_probed_tmp.txt $STD_OUT
 	Number_of_lines=$(cat .tmp/web_probed_tmp.txt | anew web/webs.txt  | wc -l )
 	printf "${green}Found!!: $Number_of_lines New Websites${reset}\n\n"
 	printf "${yellow}Web probing Ended${reset}\n"
