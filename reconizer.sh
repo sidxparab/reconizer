@@ -338,6 +338,7 @@ while getopts ":d:o:snahc" opt;do
 			web_probing
 			web_screenshot
 			nuclei
+			;;
 		c )
 			tools_installed
 			;;
