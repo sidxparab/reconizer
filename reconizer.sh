@@ -15,6 +15,8 @@ STD_ERR="2>/dev/null"
 tools=~/Tools
 subdomains_list=$tools/sub_brute_small.txt
 GOTATOR_TIMEOUT="timeout 100"
+COMMON_WEB_PORTS="81,300,591,593,832,981,1010,1311,1099,2082,2095,2096,2480,3000,3128,3333,4243,4567,4711,4712,4993,5000,5104,5108,5280,5281,5601,5800,6543,7000,7001,7396,7474,8000,8001,8008,8014,8042,8060,8069,8080,8081,8083,8088,8090,8091,8095,8118,8123,8172,8181,8222,8243,8280,8281,8333,8337,8443,8500,8834,8880,8888,8983,9000,9001,9043,9060,9080,9090,9091,9092,9200,9443,9502,9800,9981,10000,10250,11371,12443,15672,16080,17778,18091,18092,20720,32000,55440,55672"
+
 
 banner(){
 printf "\n${green}"
@@ -36,7 +38,7 @@ start()
 	mkdir -p .tmp/
 	tools=~/Tools
 	tools_installed
-	printf "\n${green}##########################################################################${reset}"
+	printf "\n${green}#############################################################################${reset}"
 	printf "\n${red}Target: $domain ${reset}\n"
 }
 
@@ -152,10 +154,14 @@ subdomain_crt()
 }
 
 subdomain_active()
-{
+{	
 	printf "${yellow}Active Subdomain Enumeration Started${reset}\n\n"
 	cat .tmp/passive_subs.txt .tmp/crtsh_subs.txt | anew -q .tmp/subs_to_resolve.txt
-	eval puredns resolve .tmp/subs_to_resolve.txt -w .tmp/subs_valid.txt -r $tools/resolvers.txt --resolvers-trusted $tools/resolvers_trusted.txt $STD_OUT
+	if [ axiom='True' ]; then
+		axiom-scan .tmp/subs_to_resolve.txt -m puredns-resolve -r /home/op/lists/resolvers.txt --resolvers-trusted /home/op/lists/resolvers_trusted.txt -o .tmp/subs_valid.txt &>/dev/null
+	else
+		eval puredns resolve .tmp/subs_to_resolve.txt -w .tmp/subs_valid.txt -r $tools/resolvers.txt --resolvers-trusted $tools/resolvers_trusted.txt $STD_OUT
+	fi
 	Number_of_lines=$(cat .tmp/subs_valid.txt | grep ".$domain$" | anew subdomains/subdomains.txt | wc -l)
 	printf "${green}Found!!: $Number_of_lines valid subdomains ${reset}\n\n"
 	printf "${yellow}Active Subdomain Enumeration Ended${reset}\n"
@@ -165,7 +171,11 @@ subdomain_active()
 subdomain_bruteforcing()
 {
 	printf "${yellow}Subdomain Bruteforcing Started${reset}\n\n"
-	eval puredns bruteforce $subdomains_list $domain -w .tmp/subs_brute_valid.txt -r $tools/resolvers.txt --resolvers-trusted $tools/resolvers_trusted.txt $STD_OUT 
+	if [ axiom='True' ]; then
+		axiom-scan $subdomains_list -m puredns-single $domain -r /home/op/lists/resolvers.txt --resolvers-trusted /home/op/lists/resolvers_trusted.txt -o .tmp/subs_brute_valid.txt &>/dev/null
+	else
+	eval puredns bruteforce $subdomains_list $domain -w .tmp/subs_brute_valid.txt -r $tools/resolvers.txt --resolvers-trusted $tools/resolvers_trusted.txt $STD_OUT
+	fi 
 	Number_of_lines=$(cat .tmp/subs_brute_valid.txt |  grep ".$domain$" | anew subdomains/subdomains.txt | wc -l)
 	printf "${green}Found!!: $Number_of_lines new subdomains ${reset}\n\n"
 	printf "${yellow}Subdomain Bruteforcing Ended${reset}\n"
@@ -175,8 +185,12 @@ subdomain_bruteforcing()
 subdomain_permutations()
 {
 	printf "${yellow}Subdomain Permutations started${reset}\n\n"
-	eval $GOTATOR_TIMEOUT gotator -sub subdomains/subdomains.txt -perm $tools/permutation_list.txt -depth 1 -numbers 10 -mindup -adv -md -silent > .tmp/gotator_out.txt
-	eval puredns resolve .tmp/gotator_out.txt -w .tmp/permutations_valid.txt -r $tools/resolvers.txt --resolvers-trusted $tools/resolvers_trusted.txt $STD_OUT
+	$GOTATOR_TIMEOUT gotator -sub subdomains/subdomains.txt -perm $tools/permutation_list.txt -depth 1 -numbers 10 -mindup -adv -md -silent > .tmp/gotator_out.txt
+	if [ axiom='True' ]; then
+		axiom-scan .tmp/gotator_out.txt -m puredns-resolve -r /home/op/lists/resolvers.txt --resolvers-trusted /home/op/lists/resolvers_trusted.txt -o .tmp/permutations_valid.txt &>/dev/null
+	else
+		eval puredns resolve .tmp/gotator_out.txt -w .tmp/permutations_valid.txt -r $tools/resolvers.txt --resolvers-trusted $tools/resolvers_trusted.txt $STD_OUT
+	fi
 	Number_of_lines=$(cat .tmp/permutations_valid.txt | grep ".$domains$" | anew subdomains/subdomains.txt | wc -l)
 	#eval rm .tmp/gotator_out.txt $STD_OUT
 	printf "${green}Found!!: $Number_of_lines new subdomains ${reset}\n\n"
@@ -187,7 +201,7 @@ subdomain_permutations()
 subdomian_scraping()
 {
 	printf "${yellow}Subdomain Scraping started${reset}\n\n"
-	eval cat subdomains/subdomains.txt | httpx -retries 2 -timeout 10 -silent -o .tmp/scrap_probed.txt $STD_OUT
+	eval httpx -retries 2 -silent -l subdomains/subdomains.txt -o .tmp/scrap_probed.txt $STD_OUT
 	eval gospider -S .tmp/scrap_probed.txt --js -d 2 --sitemap --robots -w -r > .tmp/gospider.txt
 	sed -i '/^.\{2048\}./d' .tmp/gospider.txt
 	eval cat .tmp/gospider.txt | grep -aEo 'https?://[^ ]+' | sed 's/]$//' | unfurl -u domains | grep ".$domain$" | anew -q .tmp/scrap_subs_no_resolved.txt $STD_OUT
@@ -202,7 +216,7 @@ subdomian_scraping()
 subdomain_analytics()
 {
 	printf "${yellow}Subdomain Analytics Enumeration started${reset}\n\n"
-	eval cat .tmp/scrap_probed.txt | analyticsrelationships -ch >> .tmp/analytics_subs_tmp.txt $STD_OUT
+	eval cat .tmp/scrap_probed.txt | analyticsrelationships -ch >> .tmp/analytics_subs_tmp.txt &>/dev/null
 	[ -s ".tmp/analytics_subs_tmp.txt" ] && cat .tmp/analytics_subs_tmp.txt | grep ".$domain$" | anew .tmp/analytics_subs.txt $STD_OUT
 	Number_of_lines=$(cat .tmp/analytics_subs.txt | anew subdomains/subdomains.txt | wc -l)
 	printf "${green}Found!!: $Number_of_lines new subdomains ${reset}\n\n"
@@ -214,7 +228,7 @@ subdomain_takeover()
 {
 	printf "${yellow}Subdomain Takeover Detection started${reset}\n\n"
 	eval nuclei -update-templates $DEBUG_STD
-	eval cat subdomains/subdomains.txt | nuclei -silent -tags takeover -severity low,medium,high,critical -r $tools/resolvers_trusted.txt -retries 3 -o .tmp/sub_takeover.txt $STD_OUT
+	cat subdomains/subdomains.txt | nuclei -silent -tags takeover -severity low,medium,high,critical -r $tools/resolvers_trusted.txt -retries 3 -o .tmp/sub_takeover.txt &>/dev/null
 	Number_of_lines=$(cat .tmp/sub_takeover.txt | anew subdomains/takeovers.txt | wc -l)
 	printf "${green}Found!!: $Number_of_lines subdomain takeovers${reset}\n\n"
 	printf "${yellow}Subdomain Takeover Detection Ended${reset}\n"
@@ -224,11 +238,21 @@ subdomain_takeover()
 web_probing()
 {
 	mkdir -p web/
-	printf "${yellow}Web probing started${reset}\n\n"
-	eval cat sudomains/subdomains.txt | httpx -retries 2 -timeout 10 -o .tmp/web_probed_tmp.txt $STD_OUT
+	printf "${yellow}Web probing on standard ports started${reset}\n\n"
+	eval httpx -retries 2 -silent -timeout 10 -l subdomains/subdomains.txt -o .tmp/web_probed_tmp.txt $STD_OUT
 	Number_of_lines=$(cat .tmp/web_probed_tmp.txt | anew web/webs.txt  | wc -l )
 	printf "${green}Found!!: $Number_of_lines New Websites${reset}\n\n"
-	printf "${yellow}Web probing Ended${reset}\n"
+	printf "${yellow}}Web probing on standard ports Ended${reset}\n"
+	printf "${green}##############################################################################${reset}\n\n"
+}
+
+web_probing_common()
+{
+	printf "${yellow}Web probing on common ports started${reset}\n\n"
+	eval httpx -silent -p $COMMON_WEB_PORTS -l subdomains/subdomains.txt -o .tmp/web_probed_tmp.txt $STD_OUT
+	Number_of_lines=$(cat .tmp/web_probed_tmp.txt | anew web/webs.txt  | wc -l )
+	printf "${green}Found!!: $Number_of_lines New Websites${reset}\n\n"
+	printf "${yellow}Web probing on common ports ended${reset}\n"
 	printf "${green}##############################################################################${reset}\n\n"
 }
 
@@ -240,18 +264,14 @@ web_screenshot()
 	printf "${green}##############################################################################${reset}\n\n"
 }
 
-nuclei()
+axiom_init()
 {
-	mkdir -p nuclei_output/
-	printf "${yellow}Nuclei Vulnerability Scanning Started${reset}\n\n"
-	nuclei -severity info -silent -t ~/nuclei-templates/ -retries 2 -o nuclei_output/info.txt
-	nuclei -severity low -silent -t ~/nuclei-templates/ -retries 2 -o nuclei_output/low.txt
-	nuclei -severity medium -silent -t ~/nuclei-templates/ -retries 2 -o nuclei_output/medium.txt
-	nuclei -severity high -silent -t ~/nuclei-templates/ -retries 2 -o nuclei_output/high.txt
-	nuclei -severity critical -o nuclei_output/critical.txt
-	printf "${yellow}Nuclei Vulnerability Scanning Ended${reset}\n"
-	printf "${green}##############################################################################${reset}\n\n"
+	printf "${green}##############################################################################${reset}\n"
+	printf "${green}Starting Subdomain Enumeration With *Axiom*${reset}\n"
+	axiom-exec 'wget -q -O - https://raw.githubusercontent.com/trickest/resolvers/main/resolvers.txt > /home/op/lists/resolvers.txt' &>/dev/null
+	axiom-exec 'wget -q -O - https://raw.githubusercontent.com/trickest/resolvers/main/resolvers-trusted.txt > /home/op/lists/resolvers_trusted.txt' &>/dev/null
 }
+
 
 help()
 {	
@@ -263,7 +283,8 @@ help()
 	printf "${blue}SCAN MODES${reset}\n"
 	printf "	-n OSINT Scan\n"
 	printf "	-s Subdomain Scan\n"
-	printf "	-a All Scan\n\n"
+	printf "	-a Axiom Subdomain Scan\n"
+	printf "	-f All Scan\n\n"
 	printf "${blue}OUTPUT OPTIONS${reset}\n"
 	printf "	-o Output Folder\n\n"
 	printf "${blue}SHOW HELP SECTION${reset}\n"
@@ -314,12 +335,12 @@ while getopts ":d:o:snahc" opt;do
 			subdomain_analytics
 			subdomain_takeover
 			web_probing
+			web_probing_common
 			web_screenshot
-			nuclei
 			;;
 		o ) output_folder=$OPTARG
 			;;
-		a )
+		f )
 			start
 			osint_init
 			google_dorks
@@ -336,8 +357,25 @@ while getopts ":d:o:snahc" opt;do
 			subdomain_analytics
 			subdomain_takeover
 			web_probing
+			web_probing_common
 			web_screenshot
-			nuclei
+			;;
+		a )
+			axiom="True"
+			start
+			axiom_init
+			subdomain_passive
+			subdomain_crt
+			subdomain_active
+			subdomain_bruteforcing
+			subdomain_permutations
+			subdomian_scraping
+			subdomain_analytics
+			subdomain_takeover
+			web_probing
+			web_probing_common
+			web_screenshot
+			;;
 		c )
 			tools_installed
 			;;
