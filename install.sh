@@ -54,6 +54,7 @@ go_tools()
 	eval go install -v github.com/tomnomnom/unfurl@latest $STD_OUT
 	eval go install -v github.com/Josue87/analyticsrelationships@latest $STD_OUT
 	eval go install -v github.com/projectdiscovery/nuclei/v2/cmd/nuclei@latest $STD_OUT
+	eval go install -v github.com/sensepost/gowitness@latest $STD_OUT
 
 	export GOROOT=/usr/local/go
     export GOPATH=$HOME/go
