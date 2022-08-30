@@ -152,10 +152,14 @@ subdomain_crt()
 }
 
 subdomain_active()
-{
+{	
 	printf "${yellow}Active Subdomain Enumeration Started${reset}\n\n"
-	cat .tmp/passive_subs.txt .tmp/crtsh_subs.txt | anew -q .tmp/subs_to_resolve.txt
-	eval puredns resolve .tmp/subs_to_resolve.txt -w .tmp/subs_valid.txt -r $tools/resolvers.txt --resolvers-trusted $tools/resolvers_trusted.txt $STD_OUT
+	if [ axiom='True' ]; then
+		axiom-scan .tmp/subs_to_resolve.txt -m puredns-resolve -r /home/op/lists/resolvers.txt --resolvers-trusted /home/op/lists/resolvers_trusted.txt -o tmp/subs_valid.txt $STD_OUT
+	else
+		cat .tmp/passive_subs.txt .tmp/crtsh_subs.txt | anew -q .tmp/subs_to_resolve.txt
+		eval puredns resolve .tmp/subs_to_resolve.txt -w .tmp/subs_valid.txt -r $tools/resolvers.txt --resolvers-trusted $tools/resolvers_trusted.txt $STD_OUT
+	fi
 	Number_of_lines=$(cat .tmp/subs_valid.txt | grep ".$domain$" | anew subdomains/subdomains.txt | wc -l)
 	printf "${green}Found!!: $Number_of_lines valid subdomains ${reset}\n\n"
 	printf "${yellow}Active Subdomain Enumeration Ended${reset}\n"
@@ -240,6 +244,12 @@ web_screenshot()
 	printf "${green}##############################################################################${reset}\n\n"
 }
 
+axiom_init()
+{
+	axiom-ls
+	axiom-exec 'wget -q -O - https://raw.githubusercontent.com/trickest/resolvers/main/resolvers.txt > /home/op/lists/resolvers.txt' &>/dev/null
+}
+
 
 help()
 {	
@@ -306,13 +316,29 @@ while getopts ":d:o:snahc" opt;do
 			;;
 		o ) output_folder=$OPTARG
 			;;
-		a )
+		f )
 			start
 			osint_init
 			google_dorks
 			github_dorks
 			email_osint
 			osint_end
+			subdomain_init
+			subdomain_passive
+			subdomain_crt
+			subdomain_active
+			subdomain_bruteforcing
+			subdomain_permutations
+			subdomian_scraping
+			subdomain_analytics
+			subdomain_takeover
+			web_probing
+			web_screenshot
+			;;
+		a )
+			axiom="True"
+			start
+			axiom_init
 			subdomain_init
 			subdomain_passive
 			subdomain_crt
