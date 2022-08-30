@@ -261,7 +261,8 @@ help()
 	printf "	-d example.com  Target Domain\n\n"
 	printf "${blue}SCAN MODES${reset}\n"
 	printf "	-n OSINT Scan\n"
-	printf "	-s Subdomain Scan\n\n"
+	printf "	-s Subdomain Scan\n"
+	printf "	-a All Scan\n\n"
 	printf "${blue}OUTPUT OPTIONS${reset}\n"
 	printf "	-o Output Folder\n\n"
 	printf "${blue}SHOW HELP SECTION${reset}\n"
@@ -288,7 +289,7 @@ then
 fi
 
 
-while getopts ":d:o:snhc" opt;do
+while getopts ":d:o:snahc" opt;do
 	case ${opt} in
 		d ) domain=$OPTARG
 			;;
@@ -317,6 +318,25 @@ while getopts ":d:o:snhc" opt;do
 			;;
 		o ) output_folder=$OPTARG
 			;;
+		a )
+			start
+			osint_init
+			google_dorks
+			github_dorks
+			email_osint
+			osint_end
+			subdomain_init
+			subdomain_passive
+			subdomain_crt
+			subdomain_active
+			subdomain_bruteforcing
+			subdomain_permutations
+			subdomian_scraping
+			subdomain_analytics
+			subdomain_takeover
+			web_probing
+			web_screenshot
+			nuclei
 		c )
 			tools_installed
 			;;
