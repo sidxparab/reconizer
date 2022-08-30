@@ -136,7 +136,7 @@ subdomain_passive()
 	cat .tmp/gau_tmp.txt | unfurl -u domains | grep ".$domain$" | anew -q .tmp/passive_gau.txt
 
 	Number_of_lines=$(find .tmp -type f -iname "passive*" -exec cat {} \; | sed "s/*.//" | anew .tmp/passive_subs.txt | wc -l)
-	printf "${green}Found!!: $Total_subs new subdomains${reset}\n\n"
+	printf "${green}Found!!: $Number_of_lines new subdomains${reset}\n\n"
 	printf "${yellow}Passive Enumeration Ended${reset}\n"
 	printf "${green}##############################################################################${reset}\n\n"
 }
