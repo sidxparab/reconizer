@@ -178,7 +178,7 @@ subdomain_permutations()
 	eval $GOTATOR_TIMEOUT gotator -sub subdomains/subdomains.txt -perm $tools/permutation_list.txt -depth 1 -numbers 10 -mindup -adv -md -silent > .tmp/gotator_out.txt $STD_OUT
 	eval puredns resolve .tmp/gotator_out.txt -w .tmp/permutations_valid.txt -r $tools/resolvers.txt --resolvers-trusted $tools/resolvers_trusted.txt $STD_OUT
 	Number_of_lines=$(cat .tmp/permutations_valid.txt | grep ".$domains$" | anew subdomains/subdomains.txt | wc -l)
-	#eval rm -rf .tmp/gotator_out.txt $STD_OUT
+	#eval rm .tmp/gotator_out.txt $STD_OUT
 	printf "${green}Found!!: $Number_of_lines new subdomains ${reset}\n\n"
 	printf "${yellow}Subdomain Permutations Ended${reset}\n"
 	printf "${green}##############################################################################${reset}\n\n"
@@ -193,6 +193,7 @@ subdomian_scraping()
 	eval cat .tmp/gospider.txt | grep -aEo 'https?://[^ ]+' | sed 's/]$//' | unfurl -u domains | grep ".$domain$" | anew -q .tmp/scrap_subs_no_resolved.txt $STD_OUT
 	eval puredns resolve .tmp/scrap_subs_no_resolved.txt -w .tmp/scrap_valid.txt -r $tools/resolvers.txt --resolvers-trusted $tools/resolvers_trusted.txt $STD_OUT
 	Number_of_lines=$(cat .tmp/scrap_valid.txt | grep ".$domain$" | anew subdomains/subdomains.txt | wc -l)
+	#eval rm .tmp/ gospider.txt $STD_OUT
 	printf "${green}Found!!: $Number_of_lines new subdomains ${reset}\n\n"
 	printf "${yellow}Subdomain Scraping Ended${reset}\n"
 	printf "${green}##############################################################################${reset}\n\n"
