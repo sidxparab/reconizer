@@ -187,7 +187,7 @@ subdomain_permutations()
 subdomian_scraping()
 {
 	printf "${yellow}Subdomain Scraping started${reset}\n\n"
-	eval cat subdomains/subdomains.txt | httpx -retries 2 -timeout 10 -o .tmp/scrap_probed.txt $STD_OUT
+	eval cat subdomains/subdomains.txt | httpx -retries 2 -timeout 10 -silent -o .tmp/scrap_probed.txt $STD_OUT
 	eval gospider -S .tmp/scrap_probed.txt --js -d 2 --sitemap --robots -w -r > .tmp/gospider.txt
 	sed -i '/^.\{2048\}./d' .tmp/gospider.txt
 	eval cat .tmp/gospider.txt | grep -aEo 'https?://[^ ]+' | sed 's/]$//' | unfurl -u domains | grep ".$domain$" | anew -q .tmp/scrap_subs_no_resolved.txt $STD_OUT
