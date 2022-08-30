@@ -187,7 +187,7 @@ subdomain_permutations()
 subdomian_scraping()
 {
 	printf "${yellow}Subdomain Scraping started${reset}\n\n"
-	eval cat subdomains/subdomains.txt | httpx -retries 2 -timeout 10 -silent -o .tmp/scrap_probed.txt $STD_OUT
+	eval httpx -retries 2 -silent -l subdomains/subdomains.txt -o .tmp/scrap_probed.txt $STD_OUT
 	eval gospider -S .tmp/scrap_probed.txt --js -d 2 --sitemap --robots -w -r > .tmp/gospider.txt
 	sed -i '/^.\{2048\}./d' .tmp/gospider.txt
 	eval cat .tmp/gospider.txt | grep -aEo 'https?://[^ ]+' | sed 's/]$//' | unfurl -u domains | grep ".$domain$" | anew -q .tmp/scrap_subs_no_resolved.txt $STD_OUT
@@ -240,18 +240,6 @@ web_screenshot()
 	printf "${green}##############################################################################${reset}\n\n"
 }
 
-nuclei()
-{
-	mkdir -p nuclei_output/
-	printf "${yellow}Nuclei Vulnerability Scanning Started${reset}\n\n"
-	nuclei -severity info -silent -t ~/nuclei-templates/ -retries 2 -o nuclei_output/info.txt
-	nuclei -severity low -silent -t ~/nuclei-templates/ -retries 2 -o nuclei_output/low.txt
-	nuclei -severity medium -silent -t ~/nuclei-templates/ -retries 2 -o nuclei_output/medium.txt
-	nuclei -severity high -silent -t ~/nuclei-templates/ -retries 2 -o nuclei_output/high.txt
-	nuclei -severity critical -o nuclei_output/critical.txt
-	printf "${yellow}Nuclei Vulnerability Scanning Ended${reset}\n"
-	printf "${green}##############################################################################${reset}\n\n"
-}
 
 help()
 {	
@@ -315,7 +303,6 @@ while getopts ":d:o:snahc" opt;do
 			subdomain_takeover
 			web_probing
 			web_screenshot
-			nuclei
 			;;
 		o ) output_folder=$OPTARG
 			;;
@@ -337,7 +324,6 @@ while getopts ":d:o:snahc" opt;do
 			subdomain_takeover
 			web_probing
 			web_screenshot
-			nuclei
 			;;
 		c )
 			tools_installed
