@@ -55,6 +55,7 @@ cd reconizer/
 | -c | Check for Installed tools |
 | -n | Run OSINT mode  |
 | -r | Run Subdomain Enumeration Mode |
+| -a | All scan (OSINT+Subdomain)|
 | -h | Show help section |
 
 
