@@ -239,6 +239,19 @@ web_screenshot()
 	printf "${green}##############################################################################${reset}\n\n"
 }
 
+nuclei()
+{
+	mkdir -p nuclei_output/
+	printf "${yellow}Nuclei Vulnerability Scanning Started${reset}\n\n"
+	nuclei -severity info -silent -t ~/nuclei-templates/ -retries 2 -o nuclei_output/info.txt
+	nuclei -severity low -silent -t ~/nuclei-templates/ -retries 2 -o nuclei_output/low.txt
+	nuclei -severity medium -silent -t ~/nuclei-templates/ -retries 2 -o nuclei_output/medium.txt
+	nuclei -severity high -silent -t ~/nuclei-templates/ -retries 2 -o nuclei_output/high.txt
+	nuclei -severity critical -o nuclei_output/critical.txt
+	printf "${yellow}Nuclei Vulnerability Scanning Ended${reset}\n"
+	printf "${green}##############################################################################${reset}\n\n"
+}
+
 help()
 {	
 	printf "Reconizer is a all-in-one Reconnaisance tool that performs\n"
@@ -300,6 +313,7 @@ while getopts ":d:o:snhc" opt;do
 			subdomain_takeover
 			web_probing
 			web_screenshot
+			nuclei
 			;;
 		o ) output_folder=$OPTARG
 			;;
