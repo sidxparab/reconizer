@@ -65,6 +65,7 @@ tools_installed()
 	eval type -P unfurl $STD_OUT && printf "${green} [*] Unfurl [YES]${reset}\n" || printf "${red} [*] Unfurl [NO]${reset}\n"
 	eval type -P analyticsrelationships $STD_OUT && printf "${green} [*] Analyticsrelationships [YES]${reset}\n" || printf "${red} [*] Analyticsrelationships [NO]${reset}\n"
 	eval type -P nuclei $STD_OUT && printf "${green} [*] Nuclei [YES]${reset}\n" || printf "${red} [*] Nuclei [NO]${reset}\n"
+	eval type -P gowitness $STD_OUT && printf "${green} [*] Gowitness [YES]${reset}\n" || printf "${red} [*] Gowitness [NO]${reset}\n"
 
 
 	printf "${green}##############################################################################${reset}\n\n"
@@ -228,8 +229,14 @@ web_probing()
 	printf "${green}Found!!: $Number_of_lines New Websites${reset}\n\n"
 	printf "${yellow}Web probing Ended${reset}\n"
 	printf "${green}##############################################################################${reset}\n\n"
+}
 
-
+web_screenshot()
+{
+	printf "${yellow}Web screenshots Started${reset}\n\n"
+	eval gowitness file -f web/webs.txt -t 8 --disable-logging $STD_OUT
+	printf "${yellow}Web screenshots Ended${reset}\n"
+	printf "${green}##############################################################################${reset}\n\n"
 }
 
 help()
@@ -291,6 +298,8 @@ while getopts ":d:o:snhc" opt;do
 			subdomian_scraping
 			subdomain_analytics
 			subdomain_takeover
+			web_probing
+			web_screenshot
 			;;
 		o ) output_folder=$OPTARG
 			;;
