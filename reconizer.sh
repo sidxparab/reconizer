@@ -14,7 +14,7 @@ STD_ERR="2>/dev/null"
 
 tools=~/Tools
 subdomains_list=$tools/sub_brute_small.txt
-GOTATOR_TIMEOUT="timeout 100"
+GOTATOR_TIMEOUT="timeout 200"
 COMMON_WEB_PORTS="81,300,591,593,832,981,1010,1311,1099,2082,2095,2096,2480,3000,3128,3333,4243,4567,4711,4712,4993,5000,5104,5108,5280,5281,5601,5800,6543,7000,7001,7396,7474,8000,8001,8008,8014,8042,8060,8069,8080,8081,8083,8088,8090,8091,8095,8118,8123,8172,8181,8222,8243,8280,8281,8333,8337,8443,8500,8834,8880,8888,8983,9000,9001,9043,9060,9080,9090,9091,9092,9200,9443,9502,9800,9981,10000,10250,11371,12443,15672,16080,17778,18091,18092,20720,32000,55440,55672"
 
 
@@ -47,12 +47,6 @@ tools_installed()
 {
 	printf "${yellow} Checking the installation of tools${reset}\n"
 	printf "${green}###########################################################################${reset}\n"
-	[ -f $tools/ctfr/ctfr.py ] && printf "${green} [*] ctfr.py [YES]${reset}\n" || printf "${bred} [*] ctfr.py [NO]${reset}\n"
-	[ -f $tools/dnsvalidator/dnsvalidator/dnsvalidator.py ] && printf "${green} [*] dnsvalidator [YES]${reset}\n" || printf "${bred} [*] dnsvalidator [NO]${reset}\n"
-	[ -f $tools/dorks_hunter/dorks_hunter.py ] && printf "${green} [*] dorks_hunter [YES]${reset}\n" || printf "${bred} [*] dorks_hunter [NO]${reset}\n"
-
-
-
 
 	eval type -P amass $STD_OUT && printf "${green} [*] Amass [YES]${reset}\n" || printf "${red} [*] Amass [NO]${reset}\n"
 	eval type -P subfinder $STD_OUT && printf "${green} [*] Subfinder [YES]${reset}\n" || printf "${red} [*] Subfinder [NO]${reset}\n"
@@ -68,7 +62,10 @@ tools_installed()
 	eval type -P analyticsrelationships $STD_OUT && printf "${green} [*] Analyticsrelationships [YES]${reset}\n" || printf "${red} [*] Analyticsrelationships [NO]${reset}\n"
 	eval type -P nuclei $STD_OUT && printf "${green} [*] Nuclei [YES]${reset}\n" || printf "${red} [*] Nuclei [NO]${reset}\n"
 	eval type -P gowitness $STD_OUT && printf "${green} [*] Gowitness [YES]${reset}\n" || printf "${red} [*] Gowitness [NO]${reset}\n"
-
+	
+	[ -f $tools/ctfr/ctfr.py ] && printf "${green} [*] ctfr.py [YES]${reset}\n" || printf "${bred} [*] ctfr.py [NO]${reset}\n"
+	[ -f $tools/dnsvalidator/dnsvalidator/dnsvalidator.py ] && printf "${green} [*] dnsvalidator [YES]${reset}\n" || printf "${bred} [*] dnsvalidator [NO]${reset}\n"
+	[ -f $tools/dorks_hunter/dorks_hunter.py ] && printf "${green} [*] dorks_hunter [YES]${reset}\n" || printf "${bred} [*] dorks_hunter [NO]${reset}\n"
 
 	printf "${green}##############################################################################${reset}\n\n"
 }
@@ -157,7 +154,7 @@ subdomain_active()
 {	
 	printf "${yellow}Active Subdomain Enumeration Started${reset}\n\n"
 	cat .tmp/passive_subs.txt .tmp/crtsh_subs.txt | anew -q .tmp/subs_to_resolve.txt
-	if [ axiom='True' ]; then
+	if [ "$axiom"= True ]; then
 		axiom-scan .tmp/subs_to_resolve.txt -m puredns-resolve -r /home/op/lists/resolvers.txt --resolvers-trusted /home/op/lists/resolvers_trusted.txt -o .tmp/subs_valid.txt &>/dev/null
 	else
 		eval puredns resolve .tmp/subs_to_resolve.txt -w .tmp/subs_valid.txt -r $tools/resolvers.txt --resolvers-trusted $tools/resolvers_trusted.txt $STD_OUT
@@ -171,7 +168,7 @@ subdomain_active()
 subdomain_bruteforcing()
 {
 	printf "${yellow}Subdomain Bruteforcing Started${reset}\n\n"
-	if [ axiom='True' ]; then
+	if [ "$axiom"= True ]; then
 		axiom-scan $subdomains_list -m puredns-single $domain -r /home/op/lists/resolvers.txt --resolvers-trusted /home/op/lists/resolvers_trusted.txt -o .tmp/subs_brute_valid.txt &>/dev/null
 	else
 	eval puredns bruteforce $subdomains_list $domain -w .tmp/subs_brute_valid.txt -r $tools/resolvers.txt --resolvers-trusted $tools/resolvers_trusted.txt $STD_OUT
@@ -186,13 +183,13 @@ subdomain_permutations()
 {
 	printf "${yellow}Subdomain Permutations started${reset}\n\n"
 	$GOTATOR_TIMEOUT gotator -sub subdomains/subdomains.txt -perm $tools/permutation_list.txt -depth 1 -numbers 10 -mindup -adv -md -silent > .tmp/gotator_out.txt
-	if [ axiom='True' ]; then
+	if [ "$axiom"= True ]; then
 		axiom-scan .tmp/gotator_out.txt -m puredns-resolve -r /home/op/lists/resolvers.txt --resolvers-trusted /home/op/lists/resolvers_trusted.txt -o .tmp/permutations_valid.txt &>/dev/null
 	else
 		eval puredns resolve .tmp/gotator_out.txt -w .tmp/permutations_valid.txt -r $tools/resolvers.txt --resolvers-trusted $tools/resolvers_trusted.txt $STD_OUT
 	fi
 	Number_of_lines=$(cat .tmp/permutations_valid.txt | grep ".$domains$" | anew subdomains/subdomains.txt | wc -l)
-	#eval rm .tmp/gotator_out.txt $STD_OUT
+	eval rm .tmp/gotator_out.txt $STD_OUT
 	printf "${green}Found!!: $Number_of_lines new subdomains ${reset}\n\n"
 	printf "${yellow}Subdomain Permutations Ended${reset}\n"
 	printf "${green}##############################################################################${reset}\n\n"
@@ -207,7 +204,7 @@ subdomian_scraping()
 	eval cat .tmp/gospider.txt | grep -aEo 'https?://[^ ]+' | sed 's/]$//' | unfurl -u domains | grep ".$domain$" | anew -q .tmp/scrap_subs_no_resolved.txt $STD_OUT
 	eval puredns resolve .tmp/scrap_subs_no_resolved.txt -w .tmp/scrap_valid.txt -r $tools/resolvers.txt --resolvers-trusted $tools/resolvers_trusted.txt $STD_OUT
 	Number_of_lines=$(cat .tmp/scrap_valid.txt | grep ".$domain$" | anew subdomains/subdomains.txt | wc -l)
-	#eval rm .tmp/ gospider.txt $STD_OUT
+	eval rm .tmp/ gospider.txt $STD_OUT
 	printf "${green}Found!!: $Number_of_lines new subdomains ${reset}\n\n"
 	printf "${yellow}Subdomain Scraping Ended${reset}\n"
 	printf "${green}##############################################################################${reset}\n\n"
@@ -264,12 +261,20 @@ web_screenshot()
 	printf "${green}##############################################################################${reset}\n\n"
 }
 
+subdomain_end()
+{
+	printf "${green}Subdomain Enumeration Ended${reset}\n"
+	printf "${green}##############################################################################${reset}\n"
+	printf "${green}##############################################################################${reset}\n\n"
+}
+
 axiom_init()
 {
 	printf "${green}##############################################################################${reset}\n"
 	printf "${green}Starting Subdomain Enumeration With *Axiom*${reset}\n"
 	axiom-exec 'wget -q -O - https://raw.githubusercontent.com/trickest/resolvers/main/resolvers.txt > /home/op/lists/resolvers.txt' &>/dev/null
 	axiom-exec 'wget -q -O - https://raw.githubusercontent.com/trickest/resolvers/main/resolvers-trusted.txt > /home/op/lists/resolvers_trusted.txt' &>/dev/null
+	mkdir -p subdomains/
 }
 
 
@@ -337,6 +342,7 @@ while getopts ":d:o:snahc" opt;do
 			web_probing
 			web_probing_common
 			web_screenshot
+			subdomain_end
 			;;
 		o ) output_folder=$OPTARG
 			;;
@@ -359,6 +365,7 @@ while getopts ":d:o:snahc" opt;do
 			web_probing
 			web_probing_common
 			web_screenshot
+			subdomain_end
 			;;
 		a )
 			axiom="True"
@@ -375,6 +382,7 @@ while getopts ":d:o:snahc" opt;do
 			web_probing
 			web_probing_common
 			web_screenshot
+			subdomain_end
 			;;
 		c )
 			tools_installed
