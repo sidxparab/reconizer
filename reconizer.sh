@@ -261,6 +261,13 @@ web_screenshot()
 	printf "${green}##############################################################################${reset}\n\n"
 }
 
+subdomain_end()
+{
+	printf "${green}Subdomain Enumeration Ended${reset}\n"
+	printf "${green}##############################################################################${reset}\n"
+	printf "${green}##############################################################################${reset}\n\n"
+}
+
 axiom_init()
 {
 	printf "${green}##############################################################################${reset}\n"
@@ -334,6 +341,7 @@ while getopts ":d:o:snahc" opt;do
 			web_probing
 			web_probing_common
 			web_screenshot
+			subdomain_end
 			;;
 		o ) output_folder=$OPTARG
 			;;
@@ -356,11 +364,13 @@ while getopts ":d:o:snahc" opt;do
 			web_probing
 			web_probing_common
 			web_screenshot
+			subdomain_end
 			;;
 		a )
 			axiom="True"
 			start
 			axiom_init
+			subdomain_init
 			subdomain_passive
 			subdomain_crt
 			subdomain_active
@@ -372,6 +382,7 @@ while getopts ":d:o:snahc" opt;do
 			web_probing
 			web_probing_common
 			web_screenshot
+			subdomain_end
 			;;
 		c )
 			tools_installed
