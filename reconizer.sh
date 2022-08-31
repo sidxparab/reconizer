@@ -154,7 +154,7 @@ subdomain_active()
 {	
 	printf "${yellow}Active Subdomain Enumeration Started${reset}\n\n"
 	cat .tmp/passive_subs.txt .tmp/crtsh_subs.txt | anew -q .tmp/subs_to_resolve.txt
-	if [ axiom='True' ]; then
+	if [ "$axiom"= True ]; then
 		axiom-scan .tmp/subs_to_resolve.txt -m puredns-resolve -r /home/op/lists/resolvers.txt --resolvers-trusted /home/op/lists/resolvers_trusted.txt -o .tmp/subs_valid.txt &>/dev/null
 	else
 		eval puredns resolve .tmp/subs_to_resolve.txt -w .tmp/subs_valid.txt -r $tools/resolvers.txt --resolvers-trusted $tools/resolvers_trusted.txt $STD_OUT
@@ -168,7 +168,7 @@ subdomain_active()
 subdomain_bruteforcing()
 {
 	printf "${yellow}Subdomain Bruteforcing Started${reset}\n\n"
-	if [ axiom='True' ]; then
+	if [ "$axiom"= True ]; then
 		axiom-scan $subdomains_list -m puredns-single $domain -r /home/op/lists/resolvers.txt --resolvers-trusted /home/op/lists/resolvers_trusted.txt -o .tmp/subs_brute_valid.txt &>/dev/null
 	else
 	eval puredns bruteforce $subdomains_list $domain -w .tmp/subs_brute_valid.txt -r $tools/resolvers.txt --resolvers-trusted $tools/resolvers_trusted.txt $STD_OUT
@@ -183,7 +183,7 @@ subdomain_permutations()
 {
 	printf "${yellow}Subdomain Permutations started${reset}\n\n"
 	$GOTATOR_TIMEOUT gotator -sub subdomains/subdomains.txt -perm $tools/permutation_list.txt -depth 1 -numbers 10 -mindup -adv -md -silent > .tmp/gotator_out.txt
-	if [ axiom='True' ]; then
+	if [ "$axiom"= True ]; then
 		axiom-scan .tmp/gotator_out.txt -m puredns-resolve -r /home/op/lists/resolvers.txt --resolvers-trusted /home/op/lists/resolvers_trusted.txt -o .tmp/permutations_valid.txt &>/dev/null
 	else
 		eval puredns resolve .tmp/gotator_out.txt -w .tmp/permutations_valid.txt -r $tools/resolvers.txt --resolvers-trusted $tools/resolvers_trusted.txt $STD_OUT
