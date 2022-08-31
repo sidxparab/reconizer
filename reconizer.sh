@@ -47,12 +47,6 @@ tools_installed()
 {
 	printf "${yellow} Checking the installation of tools${reset}\n"
 	printf "${green}###########################################################################${reset}\n"
-	[ -f $tools/ctfr/ctfr.py ] && printf "${green} [*] ctfr.py [YES]${reset}\n" || printf "${bred} [*] ctfr.py [NO]${reset}\n"
-	[ -f $tools/dnsvalidator/dnsvalidator/dnsvalidator.py ] && printf "${green} [*] dnsvalidator [YES]${reset}\n" || printf "${bred} [*] dnsvalidator [NO]${reset}\n"
-	[ -f $tools/dorks_hunter/dorks_hunter.py ] && printf "${green} [*] dorks_hunter [YES]${reset}\n" || printf "${bred} [*] dorks_hunter [NO]${reset}\n"
-
-
-
 
 	eval type -P amass $STD_OUT && printf "${green} [*] Amass [YES]${reset}\n" || printf "${red} [*] Amass [NO]${reset}\n"
 	eval type -P subfinder $STD_OUT && printf "${green} [*] Subfinder [YES]${reset}\n" || printf "${red} [*] Subfinder [NO]${reset}\n"
@@ -68,7 +62,10 @@ tools_installed()
 	eval type -P analyticsrelationships $STD_OUT && printf "${green} [*] Analyticsrelationships [YES]${reset}\n" || printf "${red} [*] Analyticsrelationships [NO]${reset}\n"
 	eval type -P nuclei $STD_OUT && printf "${green} [*] Nuclei [YES]${reset}\n" || printf "${red} [*] Nuclei [NO]${reset}\n"
 	eval type -P gowitness $STD_OUT && printf "${green} [*] Gowitness [YES]${reset}\n" || printf "${red} [*] Gowitness [NO]${reset}\n"
-
+	
+	[ -f $tools/ctfr/ctfr.py ] && printf "${green} [*] ctfr.py [YES]${reset}\n" || printf "${bred} [*] ctfr.py [NO]${reset}\n"
+	[ -f $tools/dnsvalidator/dnsvalidator/dnsvalidator.py ] && printf "${green} [*] dnsvalidator [YES]${reset}\n" || printf "${bred} [*] dnsvalidator [NO]${reset}\n"
+	[ -f $tools/dorks_hunter/dorks_hunter.py ] && printf "${green} [*] dorks_hunter [YES]${reset}\n" || printf "${bred} [*] dorks_hunter [NO]${reset}\n"
 
 	printf "${green}##############################################################################${reset}\n\n"
 }
