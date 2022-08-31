@@ -74,6 +74,18 @@ cd reconizer/
 ./reconftw.sh -d target.com -r
 ```
 
+**Perform Full scan**
+
+```bash
+./reconftw.sh -d target.com -f
+```
+
+**Perform Axiom subdomain enumeration**
+
+```bash
+./reconftw.sh -d target.com -a
+```
+
 **Show help section**
 
 ```bash
