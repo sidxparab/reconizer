@@ -274,6 +274,7 @@ axiom_init()
 	printf "${green}Starting Subdomain Enumeration With *Axiom*${reset}\n"
 	axiom-exec 'wget -q -O - https://raw.githubusercontent.com/trickest/resolvers/main/resolvers.txt > /home/op/lists/resolvers.txt' &>/dev/null
 	axiom-exec 'wget -q -O - https://raw.githubusercontent.com/trickest/resolvers/main/resolvers-trusted.txt > /home/op/lists/resolvers_trusted.txt' &>/dev/null
+	mkdir -p subdomains/
 }
 
 
@@ -370,7 +371,6 @@ while getopts ":d:o:snahc" opt;do
 			axiom="True"
 			start
 			axiom_init
-			subdomain_init
 			subdomain_passive
 			subdomain_crt
 			subdomain_active
