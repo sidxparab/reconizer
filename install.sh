@@ -107,10 +107,11 @@ install_misc()
 	 wget -q -O - https://gist.githubusercontent.com/jhaddix/86a06c5dc309d08580a018c66354a056/raw/96f4e51d96b2203f19f6381c8c545b278eaa0837/all.txt > $tools/sub_brute_small.txt
 	 wget -q -O - https://gist.githubusercontent.com/sidxparab/94a231f058b277d995f800c0174a5744/raw/02d621d317b0161ac0d7278fa8bd0c7fb710ba6c/resolvers_trusted.txt > $tools/resolvers_trusted.txt
 	 wget -q -O - https://gist.githubusercontent.com/sidxparab/b5cf037265d376a7fdf2a5a9abac9764/raw/5dd6f19242da0de984dab02b90920edeb07621f0/permutation_list.txt > $tools/permutation_list.txt
-	 wget -q -O - https://gist.githubusercontent.com/sidxparab/5ec3b921a02734892417d551ac90e862/raw/a4b9598feb485b576d190214922ad088a599a720/provider-config.yaml > ~/.config/notify/
+	 wget -q -O - https://gist.githubusercontent.com/sidxparab/5ec3b921a02734892417d551ac90e862/raw/a4b9598feb485b576d190214922ad088a599a720/provider-config.yaml > ~/.config/notify/provider-config.yaml
 	 mkdir -p ~/.config/amass/
 	 [ ! -f ~/.config/amass/config.ini ] && wget -q -O ~/.config/amass/config.ini https://raw.githubusercontent.com/OWASP/Amass/master/examples/config.ini
 	 mkdir -p ~/.config/nuclei/
+	 chmod +x /root/.notify/provider-config.yaml
 
 }
 
