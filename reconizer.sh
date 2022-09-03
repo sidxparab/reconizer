@@ -39,7 +39,7 @@ start()
 	tools=~/Tools
 	tools_installed
 	printf "\n${green}#############################################################################${reset}"
-	printf "\n${red}Target: $domain ${reset}\n"
+	printf "\n${red}Target: $domain ${reset}\n" | notify -silent &>/dev/null
 }
 
 
@@ -62,6 +62,7 @@ tools_installed()
 	eval type -P analyticsrelationships $STD_OUT && printf "${green} [*] Analyticsrelationships [YES]${reset}\n" || printf "${red} [*] Analyticsrelationships [NO]${reset}\n"
 	eval type -P nuclei $STD_OUT && printf "${green} [*] Nuclei [YES]${reset}\n" || printf "${red} [*] Nuclei [NO]${reset}\n"
 	eval type -P gowitness $STD_OUT && printf "${green} [*] Gowitness [YES]${reset}\n" || printf "${red} [*] Gowitness [NO]${reset}\n"
+	eval type -P notify $STD_OUT && printf "${green} [*] Notify [YES]${reset}\n" || printf "${red} [*] Notify [NO]${reset}\n"
 	
 	[ -f $tools/ctfr/ctfr.py ] && printf "${green} [*] ctfr.py [YES]${reset}\n" || printf "${bred} [*] ctfr.py [NO]${reset}\n"
 	[ -f $tools/dnsvalidator/dnsvalidator/dnsvalidator.py ] && printf "${green} [*] dnsvalidator [YES]${reset}\n" || printf "${bred} [*] dnsvalidator [NO]${reset}\n"
@@ -125,7 +126,7 @@ subdomain_init()
 subdomain_passive()
 {
 	printf "${green}##############################################################################${reset}\n\n"
-	printf "${yellow}Passive Enumeration Started${reset}\n\n"
+	printf "${yellow}Passive Enumeration Started${reset}\n\n" | notify -silent &>/dev/null
 	eval subfinder -d $domain -all -config /root/.config/subfinder/config.yaml -o .tmp/passive_subfinder.txt $STD_OUT
 	eval assetfinder --subs-only $domain | anew -q .tmp/passive_assetfinder.txt $STD_OUT
 	eval findomain -t $domain -u .tmp/passive_findomain.txt $STD_OUT
@@ -135,24 +136,24 @@ subdomain_passive()
 	cat .tmp/gau_tmp.txt | unfurl -u domains | grep ".$domain$" | anew -q .tmp/passive_gau.txt
 
 	Number_of_lines=$(find .tmp -type f -iname "passive*" -exec cat {} \; | sed "s/*.//" | anew .tmp/passive_subs.txt | wc -l)
-	printf "${green}Found!!: $Number_of_lines new subdomains${reset}\n\n"
+	printf "${green}Found!!: $Number_of_lines new subdomains${reset}\n\n" | notify -silent &>/dev/null
 	printf "${yellow}Passive Enumeration Ended${reset}\n"
 	printf "${green}##############################################################################${reset}\n\n"
 }
 
 subdomain_crt()
 {
-	printf "${yellow}Certficate Transparency Enumeration Started${reset}\n\n"
+	printf "${yellow}Certficate Transparency Enumeration Started${reset}\n\n" | notify -silent &>/dev/null
 	eval python3 $tools/ctfr/ctfr.py -d $domain -o .tmp/crtsh_subs_tmp.txt $STD_OUT
 	Number_of_lines=$(cat .tmp/crtsh_subs_tmp.txt | anew .tmp/crtsh_subs.txt | wc -l)
-	printf "${green}Found!!: $Number_of_lines new subdomains ${reset}\n\n"
+	printf "${green}Found!!: $Number_of_lines new subdomains ${reset}\n\n" | notify -silent &>/dev/null
 	printf "${yellow}Certficate Transparency Enumeration Ended${reset}\n"
 	printf "${green}##############################################################################${reset}\n\n"
 }
 
 subdomain_active()
 {	
-	printf "${yellow}Active Subdomain Enumeration Started${reset}\n\n"
+	printf "${yellow}Active Subdomain Enumeration Started${reset}\n\n" | notify -silent &>/dev/null
 	cat .tmp/passive_subs.txt .tmp/crtsh_subs.txt | anew -q .tmp/subs_to_resolve.txt
 	if [ "$axiom"= True ]; then
 		axiom-scan .tmp/subs_to_resolve.txt -m puredns-resolve -r /home/op/lists/resolvers.txt --resolvers-trusted /home/op/lists/resolvers_trusted.txt -o .tmp/subs_valid.txt &>/dev/null
@@ -160,28 +161,28 @@ subdomain_active()
 		eval puredns resolve .tmp/subs_to_resolve.txt -w .tmp/subs_valid.txt -r $tools/resolvers.txt --resolvers-trusted $tools/resolvers_trusted.txt $STD_OUT
 	fi
 	Number_of_lines=$(cat .tmp/subs_valid.txt | grep ".$domain$" | anew subdomains/subdomains.txt | wc -l)
-	printf "${green}Found!!: $Number_of_lines valid subdomains ${reset}\n\n"
+	printf "${green}Found!!: $Number_of_lines valid subdomains ${reset}\n\n" | notify -silent &>/dev/null
 	printf "${yellow}Active Subdomain Enumeration Ended${reset}\n"
 	printf "${green}##############################################################################${reset}\n\n"
 }
 
 subdomain_bruteforcing()
 {
-	printf "${yellow}Subdomain Bruteforcing Started${reset}\n\n"
+	printf "${yellow}Subdomain Bruteforcing Started${reset}\n\n" | notify -silent &>/dev/null
 	if [ "$axiom"= True ]; then
 		axiom-scan $subdomains_list -m puredns-single $domain -r /home/op/lists/resolvers.txt --resolvers-trusted /home/op/lists/resolvers_trusted.txt -o .tmp/subs_brute_valid.txt &>/dev/null
 	else
 	eval puredns bruteforce $subdomains_list $domain -w .tmp/subs_brute_valid.txt -r $tools/resolvers.txt --resolvers-trusted $tools/resolvers_trusted.txt $STD_OUT
 	fi 
 	Number_of_lines=$(cat .tmp/subs_brute_valid.txt |  grep ".$domain$" | anew subdomains/subdomains.txt | wc -l)
-	printf "${green}Found!!: $Number_of_lines new subdomains ${reset}\n\n"
+	printf "${green}Found!!: $Number_of_lines new subdomains ${reset}\n\n" | notify -silent &>/dev/null
 	printf "${yellow}Subdomain Bruteforcing Ended${reset}\n"
 	printf "${green}##############################################################################${reset}\n\n"
 }
 
 subdomain_permutations()
 {
-	printf "${yellow}Subdomain Permutations started${reset}\n\n"
+	printf "${yellow}Subdomain Permutations started${reset}\n\n" | notify -silent &>/dev/null
 	$GOTATOR_TIMEOUT gotator -sub subdomains/subdomains.txt -perm $tools/permutation_list.txt -depth 1 -numbers 10 -mindup -adv -md -silent > .tmp/gotator_out.txt
 	if [ "$axiom"= True ]; then
 		axiom-scan .tmp/gotator_out.txt -m puredns-resolve -r /home/op/lists/resolvers.txt --resolvers-trusted /home/op/lists/resolvers_trusted.txt -o .tmp/permutations_valid.txt &>/dev/null
@@ -190,14 +191,14 @@ subdomain_permutations()
 	fi
 	Number_of_lines=$(cat .tmp/permutations_valid.txt | grep ".$domains$" | anew subdomains/subdomains.txt | wc -l)
 	eval rm .tmp/gotator_out.txt $STD_OUT
-	printf "${green}Found!!: $Number_of_lines new subdomains ${reset}\n\n"
+	printf "${green}Found!!: $Number_of_lines new subdomains ${reset}\n\n" | notify -silent &>/dev/null
 	printf "${yellow}Subdomain Permutations Ended${reset}\n"
 	printf "${green}##############################################################################${reset}\n\n"
 }
 
 subdomian_scraping()
 {
-	printf "${yellow}Subdomain Scraping started${reset}\n\n"
+	printf "${yellow}Subdomain Scraping started${reset}\n\n" | notify -silent &>/dev/null
 	eval httpx -retries 2 -silent -l subdomains/subdomains.txt -o .tmp/scrap_probed.txt $STD_OUT
 	eval gospider -S .tmp/scrap_probed.txt --js -d 2 --sitemap --robots -w -r > .tmp/gospider.txt
 	sed -i '/^.\{2048\}./d' .tmp/gospider.txt
@@ -205,7 +206,7 @@ subdomian_scraping()
 	eval puredns resolve .tmp/scrap_subs_no_resolved.txt -w .tmp/scrap_valid.txt -r $tools/resolvers.txt --resolvers-trusted $tools/resolvers_trusted.txt $STD_OUT
 	Number_of_lines=$(cat .tmp/scrap_valid.txt | grep ".$domain$" | anew subdomains/subdomains.txt | wc -l)
 	eval rm .tmp/ gospider.txt $STD_OUT
-	printf "${green}Found!!: $Number_of_lines new subdomains ${reset}\n\n"
+	printf "${green}Found!!: $Number_of_lines new subdomains ${reset}\n\n" | notify -silent &>/dev/null
 	printf "${yellow}Subdomain Scraping Ended${reset}\n"
 	printf "${green}##############################################################################${reset}\n\n"
 }
