@@ -111,7 +111,7 @@ install_misc()
 	 mkdir -p ~/.config/amass/
 	 [ ! -f ~/.config/amass/config.ini ] && wget -q -O ~/.config/amass/config.ini https://raw.githubusercontent.com/OWASP/Amass/master/examples/config.ini
 	 mkdir -p ~/.config/nuclei/
-	 chmod +x /root/.notify/provider-config.yaml
+	 chmod +x /root/.config/notify/provider-config.yaml
 
 }
 
