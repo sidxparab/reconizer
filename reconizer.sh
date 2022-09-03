@@ -39,7 +39,7 @@ start()
 	tools=~/Tools
 	tools_installed
 	printf "\n${green}#############################################################################${reset}"
-	printf "\n${red}Target: $domain ${reset}\n" | notify -silent &>/dev/null
+	printf "\n${red}Target: $domain ${reset}\n" | notify -silent 2>/dev/null
 }
 
 
@@ -126,7 +126,7 @@ subdomain_init()
 subdomain_passive()
 {
 	printf "${green}##############################################################################${reset}\n\n"
-	printf "${yellow}Passive Enumeration Started${reset}\n\n" | notify -silent &>/dev/null
+	printf "${yellow}Passive Enumeration Started${reset}\n\n" | notify -silent 2>/dev/null
 	eval subfinder -d $domain -all -config /root/.config/subfinder/config.yaml -o .tmp/passive_subfinder.txt $STD_OUT
 	eval assetfinder --subs-only $domain | anew -q .tmp/passive_assetfinder.txt $STD_OUT
 	eval findomain -t $domain -u .tmp/passive_findomain.txt $STD_OUT
@@ -136,24 +136,24 @@ subdomain_passive()
 	cat .tmp/gau_tmp.txt | unfurl -u domains | grep ".$domain$" | anew -q .tmp/passive_gau.txt
 
 	Number_of_lines=$(find .tmp -type f -iname "passive*" -exec cat {} \; | sed "s/*.//" | anew .tmp/passive_subs.txt | wc -l)
-	printf "${green}Found!!: $Number_of_lines new subdomains${reset}\n\n" | notify -silent &>/dev/null
+	printf "${green}Found!!: $Number_of_lines new subdomains${reset}\n\n" | notify -silent 2>/dev/null
 	printf "${yellow}Passive Enumeration Ended${reset}\n"
 	printf "${green}##############################################################################${reset}\n\n"
 }
 
 subdomain_crt()
 {
-	printf "${yellow}Certficate Transparency Enumeration Started${reset}\n\n" | notify -silent &>/dev/null
+	printf "${yellow}Certficate Transparency Enumeration Started${reset}\n\n" | notify -silent 2>/dev/null
 	eval python3 $tools/ctfr/ctfr.py -d $domain -o .tmp/crtsh_subs_tmp.txt $STD_OUT
 	Number_of_lines=$(cat .tmp/crtsh_subs_tmp.txt | anew .tmp/crtsh_subs.txt | wc -l)
-	printf "${green}Found!!: $Number_of_lines new subdomains ${reset}\n\n" | notify -silent &>/dev/null
+	printf "${green}Found!!: $Number_of_lines new subdomains ${reset}\n\n" | notify -silent 2>/dev/null
 	printf "${yellow}Certficate Transparency Enumeration Ended${reset}\n"
 	printf "${green}##############################################################################${reset}\n\n"
 }
 
 subdomain_active()
 {	
-	printf "${yellow}Active Subdomain Enumeration Started${reset}\n\n" | notify -silent &>/dev/null
+	printf "${yellow}Active Subdomain Enumeration Started${reset}\n\n" | notify -silent 2>/dev/null
 	cat .tmp/passive_subs.txt .tmp/crtsh_subs.txt | anew -q .tmp/subs_to_resolve.txt
 	if [ "$axiom"= True ]; then
 		axiom-scan .tmp/subs_to_resolve.txt -m puredns-resolve -r /home/op/lists/resolvers.txt --resolvers-trusted /home/op/lists/resolvers_trusted.txt -o .tmp/subs_valid.txt &>/dev/null
@@ -161,28 +161,28 @@ subdomain_active()
 		eval puredns resolve .tmp/subs_to_resolve.txt -w .tmp/subs_valid.txt -r $tools/resolvers.txt --resolvers-trusted $tools/resolvers_trusted.txt $STD_OUT
 	fi
 	Number_of_lines=$(cat .tmp/subs_valid.txt | grep ".$domain$" | anew subdomains/subdomains.txt | wc -l)
-	printf "${green}Found!!: $Number_of_lines valid subdomains ${reset}\n\n" | notify -silent &>/dev/null
+	printf "${green}Found!!: $Number_of_lines valid subdomains ${reset}\n\n" | notify -silent 2>/dev/null
 	printf "${yellow}Active Subdomain Enumeration Ended${reset}\n"
 	printf "${green}##############################################################################${reset}\n\n"
 }
 
 subdomain_bruteforcing()
 {
-	printf "${yellow}Subdomain Bruteforcing Started${reset}\n\n" | notify -silent &>/dev/null
+	printf "${yellow}Subdomain Bruteforcing Started${reset}\n\n" | notify -silent 2>/dev/null
 	if [ "$axiom"= True ]; then
 		axiom-scan $subdomains_list -m puredns-single $domain -r /home/op/lists/resolvers.txt --resolvers-trusted /home/op/lists/resolvers_trusted.txt -o .tmp/subs_brute_valid.txt &>/dev/null
 	else
 	eval puredns bruteforce $subdomains_list $domain -w .tmp/subs_brute_valid.txt -r $tools/resolvers.txt --resolvers-trusted $tools/resolvers_trusted.txt $STD_OUT
 	fi 
 	Number_of_lines=$(cat .tmp/subs_brute_valid.txt |  grep ".$domain$" | anew subdomains/subdomains.txt | wc -l)
-	printf "${green}Found!!: $Number_of_lines new subdomains ${reset}\n\n" | notify -silent &>/dev/null
+	printf "${green}Found!!: $Number_of_lines new subdomains ${reset}\n\n" | notify -silent 2>/dev/null
 	printf "${yellow}Subdomain Bruteforcing Ended${reset}\n"
 	printf "${green}##############################################################################${reset}\n\n"
 }
 
 subdomain_permutations()
 {
-	printf "${yellow}Subdomain Permutations started${reset}\n\n" | notify -silent &>/dev/null
+	printf "${yellow}Subdomain Permutations started${reset}\n\n" | notify -silent 2>/dev/null
 	$GOTATOR_TIMEOUT gotator -sub subdomains/subdomains.txt -perm $tools/permutation_list.txt -depth 1 -numbers 10 -mindup -adv -md -silent > .tmp/gotator_out.txt
 	if [ "$axiom"= True ]; then
 		axiom-scan .tmp/gotator_out.txt -m puredns-resolve -r /home/op/lists/resolvers.txt --resolvers-trusted /home/op/lists/resolvers_trusted.txt -o .tmp/permutations_valid.txt &>/dev/null
@@ -191,14 +191,14 @@ subdomain_permutations()
 	fi
 	Number_of_lines=$(cat .tmp/permutations_valid.txt | grep ".$domains$" | anew subdomains/subdomains.txt | wc -l)
 	eval rm .tmp/gotator_out.txt $STD_OUT
-	printf "${green}Found!!: $Number_of_lines new subdomains ${reset}\n\n" | notify -silent &>/dev/null
+	printf "${green}Found!!: $Number_of_lines new subdomains ${reset}\n\n" | notify -silent 2>/dev/null
 	printf "${yellow}Subdomain Permutations Ended${reset}\n"
 	printf "${green}##############################################################################${reset}\n\n"
 }
 
 subdomian_scraping()
 {
-	printf "${yellow}Subdomain Scraping started${reset}\n\n" | notify -silent &>/dev/null
+	printf "${yellow}Subdomain Scraping started${reset}\n\n" | notify -silent 2>/dev/null
 	eval httpx -retries 2 -silent -l subdomains/subdomains.txt -o .tmp/scrap_probed.txt $STD_OUT
 	eval gospider -S .tmp/scrap_probed.txt --js -d 2 --sitemap --robots -w -r > .tmp/gospider.txt
 	sed -i '/^.\{2048\}./d' .tmp/gospider.txt
@@ -206,29 +206,29 @@ subdomian_scraping()
 	eval puredns resolve .tmp/scrap_subs_no_resolved.txt -w .tmp/scrap_valid.txt -r $tools/resolvers.txt --resolvers-trusted $tools/resolvers_trusted.txt $STD_OUT
 	Number_of_lines=$(cat .tmp/scrap_valid.txt | grep ".$domain$" | anew subdomains/subdomains.txt | wc -l)
 	eval rm .tmp/ gospider.txt $STD_OUT
-	printf "${green}Found!!: $Number_of_lines new subdomains ${reset}\n\n" | notify -silent &>/dev/null
+	printf "${green}Found!!: $Number_of_lines new subdomains ${reset}\n\n" | notify -silent 2>/dev/null
 	printf "${yellow}Subdomain Scraping Ended${reset}\n"
 	printf "${green}##############################################################################${reset}\n\n"
 }
 
 subdomain_analytics()
 {
-	printf "${yellow}Subdomain Analytics Enumeration started${reset}\n\n"
+	printf "${yellow}Subdomain Analytics Enumeration started${reset}\n\n" | notify -silent 2>/dev/null
 	eval cat .tmp/scrap_probed.txt | analyticsrelationships -ch >> .tmp/analytics_subs_tmp.txt &>/dev/null
 	[ -s ".tmp/analytics_subs_tmp.txt" ] && cat .tmp/analytics_subs_tmp.txt | grep ".$domain$" | anew .tmp/analytics_subs.txt $STD_OUT
 	Number_of_lines=$(cat .tmp/analytics_subs.txt | anew subdomains/subdomains.txt | wc -l)
-	printf "${green}Found!!: $Number_of_lines new subdomains ${reset}\n\n"
+	printf "${green}Found!!: $Number_of_lines new subdomains ${reset}\n\n" | notify -silent 2>/dev/null
 	printf "${yellow}Subdomain Analytics Enumeration Ended${reset}\n"
 	printf "${green}##############################################################################${reset}\n\n"
 }
 
 subdomain_takeover()
 {
-	printf "${yellow}Subdomain Takeover Detection started${reset}\n\n"
+	printf "${yellow}Subdomain Takeover Detection started${reset}\n\n" | notify -silent 2>/dev/null
 	eval nuclei -update-templates $DEBUG_STD
 	cat subdomains/subdomains.txt | nuclei -silent -tags takeover -severity low,medium,high,critical -r $tools/resolvers_trusted.txt -retries 3 -o .tmp/sub_takeover.txt &>/dev/null
 	Number_of_lines=$(cat .tmp/sub_takeover.txt | anew subdomains/takeovers.txt | wc -l)
-	printf "${green}Found!!: $Number_of_lines subdomain takeovers${reset}\n\n"
+	printf "${green}Found!!: $Number_of_lines subdomain takeovers${reset}\n\n" | notify -silent 2>/dev/null
 	printf "${yellow}Subdomain Takeover Detection Ended${reset}\n"
 	printf "${green}##############################################################################${reset}\n\n"
 }
@@ -236,27 +236,27 @@ subdomain_takeover()
 web_probing()
 {
 	mkdir -p web/
-	printf "${yellow}Web probing on standard ports started${reset}\n\n"
+	printf "${yellow}Web probing on standard ports started${reset}\n\n" | notify -silent 2>/dev/null
 	eval httpx -retries 2 -silent -timeout 10 -l subdomains/subdomains.txt -o .tmp/web_probed_tmp.txt $STD_OUT
 	Number_of_lines=$(cat .tmp/web_probed_tmp.txt | anew web/webs.txt  | wc -l )
-	printf "${green}Found!!: $Number_of_lines New Websites${reset}\n\n"
+	printf "${green}Found!!: $Number_of_lines New Websites${reset}\n\n" | notify -silent 2>/dev/null
 	printf "${yellow}}Web probing on standard ports Ended${reset}\n"
 	printf "${green}##############################################################################${reset}\n\n"
 }
 
 web_probing_common()
 {
-	printf "${yellow}Web probing on common ports started${reset}\n\n"
+	printf "${yellow}Web probing on common ports started${reset}\n\n" | notify -silent 2>/dev/null
 	eval httpx -silent -p $COMMON_WEB_PORTS -l subdomains/subdomains.txt -o .tmp/web_probed_tmp.txt $STD_OUT
 	Number_of_lines=$(cat .tmp/web_probed_tmp.txt | anew web/webs.txt  | wc -l )
-	printf "${green}Found!!: $Number_of_lines New Websites${reset}\n\n"
+	printf "${green}Found!!: $Number_of_lines New Websites${reset}\n\n" | notify -silent 2>/dev/null
 	printf "${yellow}Web probing on common ports ended${reset}\n"
 	printf "${green}##############################################################################${reset}\n\n"
 }
 
 web_screenshot()
 {
-	printf "${yellow}Web screenshots Started${reset}\n\n"
+	printf "${yellow}Web screenshots Started${reset}\n\n" | notify -silent 2>/dev/null
 	eval gowitness file -f web/webs.txt -t 8 --disable-logging $STD_OUT
 	printf "${yellow}Web screenshots Ended${reset}\n"
 	printf "${green}##############################################################################${reset}\n\n"
