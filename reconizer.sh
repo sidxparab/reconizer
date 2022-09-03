@@ -11,6 +11,7 @@ reset='\033[0m'
 STD_OUT="&>/dev/null"
 STD_ERR="2>/dev/null"
 
+axiom="False"
 
 tools=~/Tools
 subdomains_list=$tools/sub_brute_small.txt
@@ -39,7 +40,7 @@ start()
 	tools=~/Tools
 	tools_installed
 	printf "\n${green}#############################################################################${reset}"
-	printf "\n${red}Target: $domain ${reset}\n" | notify -silent 2>/dev/null
+	printf "\n${red}Target: $domain ${reset}" | notify -silent 2>/dev/null
 }
 
 
@@ -126,7 +127,7 @@ subdomain_init()
 subdomain_passive()
 {
 	printf "${green}##############################################################################${reset}\n\n"
-	printf "${yellow}Passive Enumeration Started${reset}\n\n" | notify -silent 2>/dev/null
+	printf "\n${yellow}Passive Enumeration Started${reset}\n\n" | notify -silent 2>/dev/null
 	eval subfinder -d $domain -all -config /root/.config/subfinder/config.yaml -o .tmp/passive_subfinder.txt $STD_OUT
 	eval assetfinder --subs-only $domain | anew -q .tmp/passive_assetfinder.txt $STD_OUT
 	eval findomain -t $domain -u .tmp/passive_findomain.txt $STD_OUT
@@ -136,7 +137,7 @@ subdomain_passive()
 	cat .tmp/gau_tmp.txt | unfurl -u domains | grep ".$domain$" | anew -q .tmp/passive_gau.txt
 
 	Number_of_lines=$(find .tmp -type f -iname "passive*" -exec cat {} \; | sed "s/*.//" | anew .tmp/passive_subs.txt | wc -l)
-	printf "${green}Found!!: $Number_of_lines new subdomains${reset}\n\n" | notify -silent 2>/dev/null
+	printf "\n${green}Found!!: $Number_of_lines new subdomains${reset}\n\n" | notify -silent 2>/dev/null
 	printf "${yellow}Passive Enumeration Ended${reset}\n"
 	printf "${green}##############################################################################${reset}\n\n"
 }
