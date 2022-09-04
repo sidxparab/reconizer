@@ -48,6 +48,7 @@ go_tools()
 	eval go install -v github.com/OWASP/Amass/v3/...@master $STD_OUT
 	eval go install -v github.com/lc/gau/v2/cmd/gau@latest $STD_OUT
 	eval go install github.com/d3mondev/puredns/v2@latest $STD_OUT
+	eval go install github.com/projectdiscovery/tlsx/cmd/tlsx@latest $STD_OUT
 	eval go install -v github.com/Josue87/gotator@latest $STD_OUT
 	eval go install -v github.com/projectdiscovery/httpx/cmd/httpx@latest $STD_OUT
 	eval go install -v github.com/jaeles-project/gospider@latest $STD_OUT
