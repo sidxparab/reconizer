@@ -39,8 +39,9 @@ start()
 	mkdir -p .tmp/
 	tools=~/Tools
 	tools_installed
-	printf "\n${green}#############################################################################${reset}"
-	printf "\n${red}Target: $domain ${reset}" | notify -silent 2>/dev/null
+	printf "\n${green}#############################################################################${reset}\n"
+	printf "${red}Target: $domain ${reset}" | notify -silent 2>/dev/null
+	printf "\n"
 }
 
 
@@ -80,20 +81,20 @@ osint_init()
 {
 	mkdir -p OSINT/
 	printf "${green}##############################################################################${reset}\n\n"
-	printf "${green}Starting OSINT Enumeration${reset}\n"
+	printf "${green}Starting OSINT Enumeration${reset}\n" | notify -silent 2>/dev/null
 }
 
 google_dorks()
 {
 	printf "${green}##############################################################################${reset}\n\n"
-	printf "${yellow}Google Dorking Started${reset}\n\n"
+	printf "${yellow}Google Dorking Started${reset}\n\n" | notify -silent 2>/dev/null
 	python3 $tools/dorks_hunter/dorks_hunter.py -d $domain -o OSINT/dorks.txt
 }
 
 github_dorks()
 {
 	printf "${green}##############################################################################${reset}\n\n"
-	printf "${yellow}Github Dorking Started${reset}\n\n"
+	printf "${yellow}Github Dorking Started${reset}\n\n" | notify -silent 2>/dev/null
 	gitdorks_go -gd $tools/gitdorks_go/Dorks/medium_dorks.txt -nws 15 -target $domain -tf $tools/.github_tokens -ew 3 | anew -q OSINT/gitdorks.txt
 	
 }
@@ -101,7 +102,7 @@ github_dorks()
 email_osint()
 {
 	printf "${green}##############################################################################${reset}\n\n"
-	printf "${yellow}Email OSINT Started${reset}\n"
+	printf "${yellow}Email OSINT Started${reset}\n" | notify -silent 2>/dev/null
 	emailfinder -d $domain > .tmp/tmp_emailfinder.txt
 	[ -s ".tmp/tmp_emailfinder.txt" ] && cat .tmp/tmp_emailfinder.txt | awk 'matched; /^--------------/ { matched = 1 }' | anew -q OSINT/emails.txt
 	
@@ -109,7 +110,7 @@ email_osint()
 
 osint_end()
 {
-	printf "${green}OSINT Enumeration Ended${reset}\n"
+	printf "${green}OSINT Enumeration Ended${reset}\n" | notify -silent 2>/dev/null
 	printf "${green}##############################################################################${reset}\n"
 	printf "${green}##############################################################################${reset}\n\n"
 }
@@ -152,10 +153,21 @@ subdomain_crt()
 	printf "${green}##############################################################################${reset}\n\n"
 }
 
+subdomain_analytics()
+{
+	printf "${yellow}Subdomain Analytics Enumeration started${reset}\n\n" | notify -silent 2>/dev/null
+	eval cat .tmp/scrap_probed.txt | analyticsrelationships -ch >> .tmp/analytics_subs_tmp.txt &>/dev/null
+	[ -s ".tmp/analytics_subs_tmp.txt" ] && cat .tmp/analytics_subs_tmp.txt | grep ".$domain$" | anew .tmp/analytics_subs.txt $STD_OUT
+	Number_of_lines=$(cat .tmp/analytics_subs.txt | wc -l)
+	printf "${green}Found!!: $Number_of_lines new subdomains ${reset}\n\n" | notify -silent 2>/dev/null
+	printf "${yellow}Subdomain Analytics Enumeration Ended${reset}\n"
+	printf "${green}##############################################################################${reset}\n\n"
+}
+
 subdomain_active()
 {	
 	printf "${yellow}Active Subdomain Enumeration Started${reset}\n\n" | notify -silent 2>/dev/null
-	cat .tmp/passive_subs.txt .tmp/crtsh_subs.txt | anew -q .tmp/subs_to_resolve.txt
+	cat .tmp/passive_subs.txt .tmp/crtsh_subs.txt .tmp/analytics_subs.txt | anew -q .tmp/subs_to_resolve.txt
 	if [ "$axiom"= True ]; then
 		axiom-scan .tmp/subs_to_resolve.txt -m puredns-resolve -r /home/op/lists/resolvers.txt --resolvers-trusted /home/op/lists/resolvers_trusted.txt -o .tmp/subs_valid.txt &>/dev/null
 	else
@@ -197,7 +209,7 @@ subdomain_permutations()
 	printf "${green}##############################################################################${reset}\n\n"
 }
 
-subdomian_scraping()
+subdomain_scraping()
 {
 	printf "${yellow}Subdomain Scraping started${reset}\n\n" | notify -silent 2>/dev/null
 	eval httpx -retries 2 -silent -l subdomains/subdomains.txt -o .tmp/scrap_probed.txt $STD_OUT
@@ -212,16 +224,7 @@ subdomian_scraping()
 	printf "${green}##############################################################################${reset}\n\n"
 }
 
-subdomain_analytics()
-{
-	printf "${yellow}Subdomain Analytics Enumeration started${reset}\n\n" | notify -silent 2>/dev/null
-	eval cat .tmp/scrap_probed.txt | analyticsrelationships -ch >> .tmp/analytics_subs_tmp.txt &>/dev/null
-	[ -s ".tmp/analytics_subs_tmp.txt" ] && cat .tmp/analytics_subs_tmp.txt | grep ".$domain$" | anew .tmp/analytics_subs.txt $STD_OUT
-	Number_of_lines=$(cat .tmp/analytics_subs.txt | anew subdomains/subdomains.txt | wc -l)
-	printf "${green}Found!!: $Number_of_lines new subdomains ${reset}\n\n" | notify -silent 2>/dev/null
-	printf "${yellow}Subdomain Analytics Enumeration Ended${reset}\n"
-	printf "${green}##############################################################################${reset}\n\n"
-}
+
 
 subdomain_takeover()
 {
@@ -265,7 +268,7 @@ web_screenshot()
 
 subdomain_end()
 {
-	printf "${green}Subdomain Enumeration Ended${reset}\n"
+	printf "${green}Subdomain Enumeration Ended${reset}\n" | notify -silent 2>/dev/null
 	printf "${green}##############################################################################${reset}\n"
 	printf "${green}##############################################################################${reset}\n\n"
 }
@@ -273,7 +276,7 @@ subdomain_end()
 axiom_init()
 {
 	printf "${green}##############################################################################${reset}\n"
-	printf "${green}Starting Subdomain Enumeration With *Axiom*${reset}\n"
+	printf "${green}Starting Subdomain Enumeration With *Axiom*${reset}\n" | notify -silent 2>/dev/null
 	axiom-exec 'wget -q -O - https://raw.githubusercontent.com/trickest/resolvers/main/resolvers.txt > /home/op/lists/resolvers.txt' &>/dev/null
 	axiom-exec 'wget -q -O - https://raw.githubusercontent.com/trickest/resolvers/main/resolvers-trusted.txt > /home/op/lists/resolvers_trusted.txt' &>/dev/null
 	mkdir -p subdomains/
@@ -335,11 +338,11 @@ while getopts ":d:o:snahc" opt;do
 			subdomain_init
 			subdomain_passive
 			subdomain_crt
+			subdomain_analytics
 			subdomain_active
 			subdomain_bruteforcing
 			subdomain_permutations
-			subdomian_scraping
-			subdomain_analytics
+			subdomain_scraping
 			subdomain_takeover
 			web_probing
 			web_probing_common
@@ -358,11 +361,11 @@ while getopts ":d:o:snahc" opt;do
 			subdomain_init
 			subdomain_passive
 			subdomain_crt
+			subdomain_analytics
 			subdomain_active
 			subdomain_bruteforcing
 			subdomain_permutations
-			subdomian_scraping
-			subdomain_analytics
+			subdomain_scraping
 			subdomain_takeover
 			web_probing
 			web_probing_common
@@ -375,11 +378,11 @@ while getopts ":d:o:snahc" opt;do
 			axiom_init
 			subdomain_passive
 			subdomain_crt
+			subdomain_analytics
 			subdomain_active
 			subdomain_bruteforcing
 			subdomain_permutations
-			subdomian_scraping
-			subdomain_analytics
+			subdomain_scraping
 			subdomain_takeover
 			web_probing
 			web_probing_common
