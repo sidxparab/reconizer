@@ -9,7 +9,11 @@
 
 <p align="center">
   <a href="https://twitter.com/sidxparab">
-    <img src="https://img.shields.io/badge/twitter-sidxparab-orange">
+    <img src="https://img.shields.io/badge/twitter-sidxparab-blue">
+  </a>
+  <a href="https://sidxparab.gitbook.io/subdomain-enumeration-guide/">
+    <img src="https://img.shields.io/badge/doc-GitBook-orange">
+  </a>
 </p>
 
 
@@ -109,14 +113,11 @@ cd reconizer/
   - Subdomains takeover ([nuclei](https://github.com/projectdiscovery/nuclei))
 
 ## Webs
-- Web Prober ([httpx](https://github.com/projectdiscovery/httpx) and [unimap](https://github.com/Edu4rdSHL/unimap))
-- Web screenshot ([webscreenshot](https://github.com/maaaaz/webscreenshot) or [gowitness](https://github.com/sensepost/gowitness))
-- Web templates scanner ([nuclei](https://github.com/projectdiscovery/nuclei) and [nuclei geeknik](https://github.com/geeknik/the-nuclei-templates.git))
+- Web Prober ([httpx](https://github.com/projectdiscovery/httpx))
+- Web screenshot ([gowitness](https://github.com/sensepost/gowitness))
+- Web templates scanner ([nuclei](https://github.com/projectdiscovery/nuclei))
 
 
-## Features to be added:
-- Notification system(Slack, Discord, Telegram)
-- Distribute workload among instances in cloud
 
 ## Still Need help? :information_source:
 
