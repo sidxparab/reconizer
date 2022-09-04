@@ -57,6 +57,7 @@ tools_installed()
 	eval type -P gau $STD_OUT && printf "${green} [*] Gau [YES]${reset}\n" || printf "${red} [*] Gau [NO]${reset}\n"
 	eval type -P massdns $STD_OUT && printf "${green} [*] Massdns [YES]${reset}\n" || printf "${red} [*] Massdns [NO]${reset}\n"
 	eval type -P puredns $STD_OUT && printf "${green} [*] Puredns [YES]${reset}\n" || printf "${red} [*] Puredns [NO]${reset}\n"
+	eval type -P tlsx $STD_OUT && printf "${green} [*] Tlsx [YES]${reset}\n" || printf "${red} [*] Tlsx [NO]${reset}\n"
 	eval type -P gotator $STD_OUT && printf "${green} [*] Gotator [YES]${reset}\n" || printf "${red} [*] Gotator [NO]${reset}\n"
 	eval type -P httpx $STD_OUT && printf "${green} [*] Httpx [YES]${reset}\n" || printf "${red} [*] Httpx [NO]${reset}\n"
 	eval type -P gospider $STD_OUT && printf "${green} [*] Gospider [YES]${reset}\n" || printf "${red} [*] Gospider [NO]${reset}\n"
@@ -173,6 +174,7 @@ subdomain_active()
 	else
 		eval puredns resolve .tmp/subs_to_resolve.txt -w .tmp/subs_valid.txt -r $tools/resolvers.txt --resolvers-trusted $tools/resolvers_trusted.txt $STD_OUT
 	fi
+	eval cat .tmp/subs_valid.txt | tlsx -san -cn -silent -ro | anew -q .tmp/subs_valid.txt $STD_OUT
 	Number_of_lines=$(cat .tmp/subs_valid.txt | grep ".$domain$" | anew subdomains/subdomains.txt | wc -l)
 	printf "${green}Found!!: $Number_of_lines valid subdomains ${reset}\n\n" | notify -silent 2>/dev/null
 	printf "${yellow}Active Subdomain Enumeration Ended${reset}\n"
