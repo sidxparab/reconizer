@@ -167,7 +167,7 @@ subdomain_crt()
 subdomain_active()
 {	
 	printf "${yellow}Active Subdomain Enumeration Started${reset}\n\n" | notify -silent 2>/dev/null
-	cat .tmp/passive_subs.txt .tmp/crtsh_subs.txt .tmp/analytics_subs.txt | anew -q .tmp/subs_to_resolve.txt
+	cat .tmp/passive_subs.txt .tmp/crtsh_subs.txt | anew -q .tmp/subs_to_resolve.txt
 	if [ "$axiom"= True ]; then
 		axiom-scan .tmp/subs_to_resolve.txt -m puredns-resolve -r /home/op/lists/resolvers.txt --resolvers-trusted /home/op/lists/resolvers_trusted.txt -o .tmp/subs_valid.txt &>/dev/null
 	else
@@ -289,6 +289,7 @@ web_probing_common()
 web_screenshot()
 {
 	printf "${yellow}Web screenshots Started${reset}\n\n" | notify -silent 2>/dev/null
+	printf "\n"
 	eval gowitness file -f web/webs.txt -t 8 --disable-logging $STD_OUT
 	printf "${yellow}Web screenshots Ended${reset}\n"
 	printf "${green}##############################################################################${reset}\n\n"
