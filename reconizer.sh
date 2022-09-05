@@ -83,6 +83,7 @@ osint_init()
 {
 	mkdir -p OSINT/
 	printf "${green}##############################################################################${reset}\n\n"
+	printf "\n"
 	printf "${green}Starting OSINT Enumeration${reset}\n" | notify -silent 2>/dev/null
 }
 
@@ -90,6 +91,7 @@ google_dorks()
 {
 	printf "${green}##############################################################################${reset}\n\n"
 	printf "${yellow}Google Dorking Started${reset}\n\n" | notify -silent 2>/dev/null
+	printf "\n"
 	python3 $tools/dorks_hunter/dorks_hunter.py -d $domain -o OSINT/dorks.txt &>/dev/null
 }
 
@@ -97,6 +99,7 @@ github_dorks()
 {
 	printf "${green}##############################################################################${reset}\n\n"
 	printf "${yellow}Github Dorking Started${reset}\n\n" | notify -silent 2>/dev/null
+	printf "\n"
 	gitdorks_go -gd $tools/gitdorks_go/Dorks/medium_dorks.txt -nws 15 -target $domain -tf $tools/.github_tokens -ew 3 | anew -q OSINT/gitdorks.txt
 	
 }
@@ -105,6 +108,7 @@ email_osint()
 {
 	printf "${green}##############################################################################${reset}\n\n"
 	printf "${yellow}Email OSINT Started${reset}\n" | notify -silent 2>/dev/null
+	printf "\n"
 	emailfinder -d $domain > .tmp/tmp_emailfinder.txt &>/dev/null
 	[ -s ".tmp/tmp_emailfinder.txt" ] && cat .tmp/tmp_emailfinder.txt | awk 'matched; /^--------------/ { matched = 1 }' | anew -q OSINT/emails.txt
 	
@@ -113,6 +117,7 @@ email_osint()
 osint_end()
 {
 	printf "${green}OSINT Enumeration Ended${reset}\n" | notify -silent 2>/dev/null
+	printf "\n"
 	printf "${green}##############################################################################${reset}\n"
 	printf "${green}##############################################################################${reset}\n\n"
 }
