@@ -366,11 +366,11 @@ while getopts ":d:o:snahc" opt;do
 			subdomain_init
 			subdomain_passive
 			subdomain_crt
-			subdomain_analytics
 			subdomain_active
 			subdomain_bruteforcing
 			subdomain_permutations
 			subdomain_scraping
+			subdomain_analytics
 			subdomain_takeover
 			web_probing
 			web_probing_common
@@ -389,11 +389,11 @@ while getopts ":d:o:snahc" opt;do
 			subdomain_init
 			subdomain_passive
 			subdomain_crt
-			subdomain_analytics
 			subdomain_active
 			subdomain_bruteforcing
 			subdomain_permutations
 			subdomain_scraping
+			subdomain_analytics
 			subdomain_takeover
 			web_probing
 			web_probing_common
@@ -406,11 +406,11 @@ while getopts ":d:o:snahc" opt;do
 			axiom_init
 			subdomain_passive
 			subdomain_crt
-			subdomain_analytics
 			subdomain_active
 			subdomain_bruteforcing
 			subdomain_permutations
 			subdomain_scraping
+			subdomain_analytics
 			subdomain_takeover
 			web_probing
 			web_probing_common
