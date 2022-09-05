@@ -90,7 +90,7 @@ google_dorks()
 {
 	printf "${green}##############################################################################${reset}\n\n"
 	printf "${yellow}Google Dorking Started${reset}\n\n" | notify -silent 2>/dev/null
-	python3 $tools/dorks_hunter/dorks_hunter.py -d $domain -o OSINT/dorks.txt
+	python3 $tools/dorks_hunter/dorks_hunter.py -d $domain -o OSINT/dorks.txt &>/dev/null
 }
 
 github_dorks()
@@ -105,7 +105,7 @@ email_osint()
 {
 	printf "${green}##############################################################################${reset}\n\n"
 	printf "${yellow}Email OSINT Started${reset}\n" | notify -silent 2>/dev/null
-	emailfinder -d $domain > .tmp/tmp_emailfinder.txt
+	emailfinder -d $domain > .tmp/tmp_emailfinder.txt &>/dev/null
 	[ -s ".tmp/tmp_emailfinder.txt" ] && cat .tmp/tmp_emailfinder.txt | awk 'matched; /^--------------/ { matched = 1 }' | anew -q OSINT/emails.txt
 	
 }
