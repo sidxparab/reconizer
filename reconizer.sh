@@ -164,19 +164,6 @@ subdomain_crt()
 	printf "${green}##############################################################################${reset}\n\n"
 }
 
-subdomain_analytics()
-{
-	printf "${yellow}Subdomain Analytics Enumeration started${reset}\n\n" | notify -silent 2>/dev/null
-	eval cat .tmp/scrap_probed.txt | analyticsrelationships -ch >> .tmp/analytics_subs_tmp.txt &>/dev/null
-	[ -s ".tmp/analytics_subs_tmp.txt" ] && cat .tmp/analytics_subs_tmp.txt | grep ".$domain$" | anew .tmp/analytics_subs.txt $STD_OUT
-	Number_of_lines=$(cat .tmp/analytics_subs.txt | wc -l)
-	printf "\n"
-	printf "${green}Found!!: $Number_of_lines new subdomains ${reset}\n\n" | notify -silent 2>/dev/null
-	printf "\n"
-	printf "${yellow}Subdomain Analytics Enumeration Ended${reset}\n"
-	printf "${green}##############################################################################${reset}\n\n"
-}
-
 subdomain_active()
 {	
 	printf "${yellow}Active Subdomain Enumeration Started${reset}\n\n" | notify -silent 2>/dev/null
@@ -243,6 +230,19 @@ subdomain_scraping()
 	printf "${green}Found!!: $Number_of_lines new subdomains ${reset}\n\n" | notify -silent 2>/dev/null
 	printf "\n"
 	printf "${yellow}Subdomain Scraping Ended${reset}\n"
+	printf "${green}##############################################################################${reset}\n\n"
+}
+
+subdomain_analytics()
+{
+	printf "${yellow}Subdomain Analytics Enumeration started${reset}\n\n" | notify -silent 2>/dev/null
+	eval cat .tmp/scrap_probed.txt | analyticsrelationships -ch >> .tmp/analytics_subs_tmp.txt &>/dev/null
+	[ -s ".tmp/analytics_subs_tmp.txt" ] && cat .tmp/analytics_subs_tmp.txt | grep ".$domain$" | anew .tmp/analytics_subs.txt $STD_OUT
+	Number_of_lines=$(cat .tmp/analytics_subs.txt | anew subdomains/subdomains.txt | wc -l)
+	printf "\n"
+	printf "${green}Found!!: $Number_of_lines new subdomains ${reset}\n\n" | notify -silent 2>/dev/null
+	printf "\n"
+	printf "${yellow}Subdomain Analytics Enumeration Ended${reset}\n"
 	printf "${green}##############################################################################${reset}\n\n"
 }
 
