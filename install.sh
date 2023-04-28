@@ -8,7 +8,7 @@ reset='\033[0m'
 
 STD_OUT="&>/dev/null"
 STD_ERR="2>/dev/null"
-
+#test
 
 shell_profile=.$(basename $(which $SHELL))rc
 mkdir -p /root/Tools
