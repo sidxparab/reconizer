@@ -104,7 +104,7 @@ install_misc()
 	 eval notify $STD_OUT
 	 mkdir -p ~/.config/notify/
 	 touch $tools/.github_tokens
-	 wget -q -O - https://wordlists-cdn.assetnote.io/data/manual/best-dns-wordlist.txt > $tools/sub_brute_large.text
+	 wget -q -O - https://wordlists-cdn.assetnote.io/data/manual/best-dns-wordlist.txt > $tools/sub_brute_large.txt
 	 wget -q -O - https://gist.githubusercontent.com/jhaddix/86a06c5dc309d08580a018c66354a056/raw/96f4e51d96b2203f19f6381c8c545b278eaa0837/all.txt > $tools/sub_brute_small.txt
 	 wget -q -O - https://gist.githubusercontent.com/sidxparab/94a231f058b277d995f800c0174a5744/raw/02d621d317b0161ac0d7278fa8bd0c7fb710ba6c/resolvers_trusted.txt > $tools/resolvers_trusted.txt
 	 wget -q -O - https://gist.githubusercontent.com/sidxparab/b5cf037265d376a7fdf2a5a9abac9764/raw/5dd6f19242da0de984dab02b90920edeb07621f0/permutation_list.txt > $tools/permutation_list.txt
